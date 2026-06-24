@@ -1,66 +1,81 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useState } from 'react';
+import GlobalHeader from '../components/GlobalHeader';
+import StrengthLogger from '../components/StrengthLogger';
 
 export default function Home() {
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [day, setDay] = useState('');
+  const [weight, setWeight] = useState('');
+  
+  const [activeTab, setActiveTab] = useState('strength');
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div style={{ width: '100%' }}>
+      <GlobalHeader 
+        date={date} setDate={setDate} 
+        day={day} setDay={setDay} 
+        weight={weight} setWeight={setWeight} 
+      />
+
+      <nav className="tab-navigation">
+        <button 
+          className={`tab-btn tab-strength ${activeTab === 'strength' ? 'active' : ''}`}
+          onClick={() => setActiveTab('strength')}
+        >
+          Strength
+        </button>
+        <button 
+          className={`tab-btn tab-cardio ${activeTab === 'cardio' ? 'active' : ''}`}
+          onClick={() => setActiveTab('cardio')}
+        >
+          Cardio
+        </button>
+        <button 
+          className={`tab-btn tab-home ${activeTab === 'home_workout' ? 'active' : ''}`}
+          onClick={() => setActiveTab('home_workout')}
+        >
+          Home Workout
+        </button>
+      </nav>
+
+      <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
+        {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} />}
+        {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} />}
+        {activeTab === 'cardio' && <div className="glass-panel" style={{padding: '20px', textAlign: 'center'}}>Cardio Logger coming soon!</div>}
+      </div>
+
+      <style jsx>{`
+        .tab-navigation {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 20px;
+          padding: 0 20px;
+        }
+        .tab-btn {
+          flex: 1;
+          padding: 10px 0;
+          border-radius: 20px;
+          background: transparent;
+          font-weight: 700;
+          font-size: 14px;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.3s;
+          color: var(--text-secondary);
+        }
+        
+        .tab-strength { border: 2px solid var(--accent-strength); }
+        .tab-strength.active { background: var(--accent-strength); color: #fff; }
+        
+        .tab-cardio { border: 2px solid var(--accent-cardio); }
+        .tab-cardio.active { background: var(--accent-cardio); color: #000; }
+        
+        .tab-home { border: 2px solid var(--accent-home); }
+        .tab-home.active { background: var(--accent-home); color: #000; }
+      `}</style>
     </div>
   );
 }

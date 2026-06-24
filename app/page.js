@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import GlobalHeader from '../components/GlobalHeader';
 import StrengthLogger from '../components/StrengthLogger';
-
 import CardioLogger from '../components/CardioLogger';
 import CalendarView from '../components/CalendarView';
+import InsightsDashboard from '../components/InsightsDashboard';
 
 export default function Home() {
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -68,6 +68,12 @@ export default function Home() {
       {mainTab === 'calendar' && (
         <div style={{ padding: '0 20px' }}>
           <CalendarView onSelectDate={handleCalendarSelect} />
+        </div>
+      )}
+
+      {mainTab === 'insights' && (
+        <div style={{ padding: '0 20px' }}>
+          <InsightsDashboard />
         </div>
       )}
 

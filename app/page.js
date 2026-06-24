@@ -4,6 +4,8 @@ import { useState } from 'react';
 import GlobalHeader from '../components/GlobalHeader';
 import StrengthLogger from '../components/StrengthLogger';
 
+import CardioLogger from '../components/CardioLogger';
+
 export default function Home() {
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [day, setDay] = useState('');
@@ -43,7 +45,7 @@ export default function Home() {
       <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
         {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} />}
         {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} />}
-        {activeTab === 'cardio' && <div className="glass-panel" style={{padding: '20px', textAlign: 'center'}}>Cardio Logger coming soon!</div>}
+        {activeTab === 'cardio' && <CardioLogger />}
       </div>
 
       <style jsx>{`

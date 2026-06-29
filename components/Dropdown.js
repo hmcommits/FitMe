@@ -8,6 +8,11 @@ export default function Dropdown({ label, value, onChange, historyOptions, onAdd
   const [inputValue, setInputValue] = useState(value || '');
   const containerRef = useRef(null);
 
+  // Sync with external value changes (e.g. when existingWorkout populates the form)
+  useEffect(() => {
+    setInputValue(value || '');
+  }, [value]);
+
   // Close dropdown if clicked outside
   useEffect(() => {
     function handleClickOutside(event) {

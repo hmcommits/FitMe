@@ -85,6 +85,16 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--accent-action);
 }
 
+/* Hide spin buttons on number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
 /* Animated Buttons */
 .btn {
   background: var(--surface-color-light);

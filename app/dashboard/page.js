@@ -69,8 +69,20 @@ export default function Dashboard() {
     if (!isNaN(dateObj.getDay())) {
       setDay(days[dateObj.getDay()]);
     }
+    
+    // Auto-switch tab based on existing workout
+    const existing = workouts.find(w => new Date(w.date).toISOString().split('T')[0] === selectedDate);
+    if (existing) {
+       setActiveTab(existing.workoutType);
+       if (existing.bodyWeight) setWeight(existing.bodyWeight.toString());
+    }
+    
     setMainTab('logger'); // Jump to the logger to view/edit this day
   };
+
+  const existingWorkoutForTab = useMemo(() => {
+    return workouts.find(w => new Date(w.date).toISOString().split('T')[0] === date && w.workoutType === activeTab);
+  }, [workouts, date, activeTab]);
 
   return (
     <div style={{ width: '100%', paddingBottom: '80px' }}>
@@ -104,9 +116,9 @@ export default function Dashboard() {
           </nav>
 
           <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
-            {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} />}
-            {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} />}
-            {activeTab === 'cardio' && <CardioLogger date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} />}
+            {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
+            {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
+            {activeTab === 'cardio' && <CardioLogger date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
           </div>
         </>
       )}

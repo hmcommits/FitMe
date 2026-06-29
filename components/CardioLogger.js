@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Dropdown from './Dropdown';
 
-export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, workouts = [] }) {
+export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, workouts = [], existingWorkout }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
   const [exercise, setExercise] = useState('');
@@ -13,6 +13,37 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
   const [todayNotes, setTodayNotes] = useState('');
   const [quality, setQuality] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (existingWorkout) {
+      if (existingWorkout.timeOfDay && existingWorkout.timeOfDay.length > 0) setTimeOfDay(existingWorkout.timeOfDay[0]);
+      setTimeNotes(existingWorkout.timeNotes || '');
+      setNextGoal(existingWorkout.nextGoal || '');
+      setTodayNotes(existingWorkout.todayNotes || '');
+      setQuality(existingWorkout.quality || '');
+      
+      if (existingWorkout.exercises && existingWorkout.exercises.length > 0) {
+        const ex = existingWorkout.exercises[0];
+        setExercise(ex.name || '');
+        setDuration(ex.durationMinutes ? ex.durationMinutes.toString() : '');
+        setSpeedLevel(ex.speedLevel ? ex.speedLevel.toString() : '');
+      } else {
+        setExercise('');
+        setDuration('');
+        setSpeedLevel('');
+      }
+    } else {
+      // Reset form
+      setTimeOfDay('morning');
+      setTimeNotes('');
+      setNextGoal('');
+      setTodayNotes('');
+      setQuality('');
+      setExercise('');
+      setDuration('');
+      setSpeedLevel('');
+    }
+  }, [existingWorkout, date]);
 
   const exerciseHistory = useMemo(() => {
     const exercises = new Set();

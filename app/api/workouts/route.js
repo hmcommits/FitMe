@@ -32,23 +32,25 @@ export async function POST(req) {
     const data = await req.json();
     await connectToDatabase();
 
-    // Upsert logic: if a workout already exists for this date and type, update it. Otherwise create new.
-    // Actually, users might log multiple things in a day. We will just save a new document per session or update the existing day's log.
-    // Let's keep it simple: create a new record.
-
-    const newWorkout = await Workout.create({
+    // Upsert logic: if a workout already exists for this date and type, update it.
+    const filter = {
       userEmail: session.user.email,
       date: new Date(data.date),
+      workoutType: data.workoutType
+    };
+
+    const update = {
       dayOfWeek: data.dayOfWeek,
       bodyWeight: data.bodyWeight || null,
-      workoutType: data.workoutType,
       timeOfDay: data.timeOfDay,
       timeNotes: data.timeNotes,
       quality: data.quality,
       nextGoal: data.nextGoal,
       todayNotes: data.todayNotes,
       exercises: data.exercises,
-    });
+    };
+
+    const newWorkout = await Workout.findOneAndUpdate(filter, update, { upsert: true, new: true });
 
     return NextResponse.json({ message: 'Workout saved successfully', workout: newWorkout }, { status: 201 });
   } catch (error) {

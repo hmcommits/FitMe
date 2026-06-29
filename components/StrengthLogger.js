@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Dropdown from './Dropdown';
 import './StrengthLogger.css';
 
-export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyWeight, onSaveSuccess, workouts = [] }) {
+export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyWeight, onSaveSuccess, workouts = [], existingWorkout }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
   
-  // Now managing an array of exercises, each with its own muscle group and sets
   const [exercisesList, setExercisesList] = useState([
     { muscleGroup: '', name: '', sets: [{ weight: '', unit: 'kg', reps: '' }] }
   ]);
@@ -17,6 +16,36 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
   const [todayNotes, setTodayNotes] = useState('');
   const [quality, setQuality] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (existingWorkout) {
+      if (existingWorkout.timeOfDay && existingWorkout.timeOfDay.length > 0) setTimeOfDay(existingWorkout.timeOfDay[0]);
+      setTimeNotes(existingWorkout.timeNotes || '');
+      setNextGoal(existingWorkout.nextGoal || '');
+      setTodayNotes(existingWorkout.todayNotes || '');
+      setQuality(existingWorkout.quality || '');
+      
+      if (existingWorkout.exercises && existingWorkout.exercises.length > 0) {
+        setExercisesList(existingWorkout.exercises.map(ex => ({
+          muscleGroup: ex.muscleGroup || '',
+          name: ex.name || '',
+          sets: ex.sets && ex.sets.length > 0 
+            ? ex.sets.map(s => ({ weight: s.weight || '', unit: s.unit || 'kg', reps: s.reps || '' }))
+            : [{ weight: '', unit: 'kg', reps: '' }]
+        })));
+      } else {
+        setExercisesList([{ muscleGroup: '', name: '', sets: [{ weight: '', unit: 'kg', reps: '' }] }]);
+      }
+    } else {
+      // Reset form
+      setTimeOfDay('morning');
+      setTimeNotes('');
+      setNextGoal('');
+      setTodayNotes('');
+      setQuality('');
+      setExercisesList([{ muscleGroup: '', name: '', sets: [{ weight: '', unit: 'kg', reps: '' }] }]);
+    }
+  }, [existingWorkout, date]);
 
   // Dynamically compute history from past workouts
   const muscleHistory = useMemo(() => {

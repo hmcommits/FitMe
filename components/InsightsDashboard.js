@@ -14,7 +14,7 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
   const [l3Tab, setL3Tab] = useState('Weight'); // 'Weight', 'Reps', 'Volume'
 
   // Dynamic Aggregation Logic
-  const { weeklyVolumeData, qualityData, timeData } = useMemo(() => {
+  const { weeklyVolumeData, qualityData, timeData, uniqueMuscles } = useMemo(() => {
     const times = { Morning: 0, Evening: 0, Both: 0 };
     const qualities = { Good: 0, Mid: 0, Bad: 0 };
     const muscleTotals = {};

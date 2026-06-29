@@ -52,6 +52,10 @@ export default function Dashboard() {
     return dates;
   }, [workouts]);
 
+  const existingWorkoutForTab = useMemo(() => {
+    return workouts.find(w => new Date(w.date).toISOString().split('T')[0] === date && w.workoutType === activeTab);
+  }, [workouts, date, activeTab]);
+
   if (status === 'unauthenticated') {
     router.push('/login');
     return null;
@@ -79,10 +83,6 @@ export default function Dashboard() {
     
     setMainTab('logger'); // Jump to the logger to view/edit this day
   };
-
-  const existingWorkoutForTab = useMemo(() => {
-    return workouts.find(w => new Date(w.date).toISOString().split('T')[0] === date && w.workoutType === activeTab);
-  }, [workouts, date, activeTab]);
 
   return (
     <div style={{ width: '100%', paddingBottom: '80px' }}>

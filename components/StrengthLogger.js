@@ -10,7 +10,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
   
   // Now managing an array of exercises, each with its own muscle group and sets
   const [exercisesList, setExercisesList] = useState([
-    { muscleGroup: '', name: '', sets: [{ weight: '', reps: '' }] }
+    { muscleGroup: '', name: '', sets: [{ weight: '', unit: 'kg', reps: '' }] }
   ]);
 
   const [nextGoal, setNextGoal] = useState('');
@@ -49,7 +49,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
 
   // Exercise List Actions
   const addExercise = (defaultMuscleGroup = '') => {
-    setExercisesList([...exercisesList, { muscleGroup: defaultMuscleGroup, name: '', sets: [{ weight: '', reps: '' }] }]);
+    setExercisesList([...exercisesList, { muscleGroup: defaultMuscleGroup, name: '', sets: [{ weight: '', unit: 'kg', reps: '' }] }]);
   };
 
   const removeExercise = (exIndex) => {
@@ -66,7 +66,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
   // Set Actions within an Exercise
   const addSet = (exIndex) => {
     const newList = [...exercisesList];
-    newList[exIndex].sets.push({ weight: '', reps: '' });
+    newList[exIndex].sets.push({ weight: '', unit: 'kg', reps: '' });
     setExercisesList(newList);
   };
 
@@ -106,7 +106,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
       exercises: exercisesList.map(ex => ({
         muscleGroup: ex.muscleGroup,
         name: ex.name,
-        sets: ex.sets.map(s => ({ weight: Number(s.weight) || 0, reps: Number(s.reps) || 0 }))
+        sets: ex.sets.map(s => ({ weight: Number(s.weight) || 0, unit: s.unit || 'kg', reps: Number(s.reps) || 0 }))
       }))
     };
 
@@ -195,19 +195,30 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
                 <div className="sets-grid mt-20">
                   <div className="sets-header">
                     <span>Set</span>
-                    <span>Weight (kg)</span>
+                    <span>Weight</span>
                     <span>Repetitions</span>
                     <span></span>
                   </div>
                   {ex.sets.map((set, setIndex) => (
                     <div key={setIndex} className="set-row">
                       <span className="set-number">{setIndex + 1}</span>
-                      <input 
-                        type="number" 
-                        value={set.weight} 
-                        onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
-                        placeholder="0"
-                      />
+                      <div style={{ display: 'flex', gap: '5px' }}>
+                        <input 
+                          type="number" 
+                          value={set.weight} 
+                          onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
+                          placeholder="0"
+                          style={{ width: '60%' }}
+                        />
+                        <select 
+                          value={set.unit} 
+                          onChange={(e) => updateSet(exIndex, setIndex, 'unit', e.target.value)}
+                          style={{ width: '40%', background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: 'none', borderRadius: '4px', outline: 'none', padding: '0 5px' }}
+                        >
+                          <option value="kg">kg</option>
+                          <option value="lbs">lbs</option>
+                        </select>
+                      </div>
                       <input 
                         type="number" 
                         value={set.reps} 

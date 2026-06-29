@@ -17,7 +17,8 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
   const { weeklyVolumeData, qualityData, timeData } = useMemo(() => {
     const times = { Morning: 0, Evening: 0, Both: 0 };
     const qualities = { Good: 0, Mid: 0, Bad: 0 };
-    const muscleTotals = { Chest: 0, Back: 0, Legs: 0, Arms: 0, Shoulders: 0 };
+    const muscleTotals = {};
+    const musclesSet = new Set();
     
     workoutHistory.forEach(w => {
       // Time
@@ -36,22 +37,31 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
       
       // Volume
       w.exercises?.forEach(ex => {
+        if (!ex.muscleGroup || ex.muscleGroup === 'Cardio') return;
+        musclesSet.add(ex.muscleGroup);
+
         let exVol = 0;
         ex.sets?.forEach(s => {
-          exVol += (s.weight || 0) * (s.reps || 0);
+          const weightInKg = s.unit === 'lbs' ? (s.weight || 0) * 0.453592 : (s.weight || 0);
+          exVol += weightInKg * (s.reps || 0);
         });
-        if (muscleTotals[ex.muscleGroup] !== undefined) {
-          muscleTotals[ex.muscleGroup] += exVol;
+        if (!muscleTotals[ex.muscleGroup]) {
+          muscleTotals[ex.muscleGroup] = 0;
         }
+        muscleTotals[ex.muscleGroup] += exVol;
       });
     });
 
     return {
       timeData: [{ name: 'Time', ...times }],
       qualityData: [{ name: 'Quality', ...qualities }],
-      weeklyVolumeData: [{ name: 'Total Volume', ...muscleTotals }]
+      weeklyVolumeData: [{ name: 'Total Volume', ...muscleTotals }],
+      uniqueMuscles: Array.from(musclesSet)
     };
   }, [workoutHistory]);
+
+  const palette = ['#00e5ff', '#ff2a2a', '#39ff14', '#ff5e00', '#bf00ff', '#ffff00', '#ff00ff', '#00ffff'];
+  const getMuscleColor = (idx) => palette[idx % palette.length];
 
   const { muscleVolumeData, exercisesForMuscle } = useMemo(() => {
     if (!selectedMuscle) return { muscleVolumeData: [], exercisesForMuscle: [] };
@@ -67,7 +77,8 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
          if (ex.muscleGroup === selectedMuscle) {
            let exVol = 0;
            ex.sets?.forEach(s => {
-             exVol += (s.weight || 0) * (s.reps || 0);
+             const weightInKg = s.unit === 'lbs' ? (s.weight || 0) * 0.453592 : (s.weight || 0);
+             exVol += weightInKg * (s.reps || 0);
            });
            dailyVol += exVol;
 
@@ -104,11 +115,12 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
            let totalReps = 0;
            let totalVolume = 0;
            ex.sets?.forEach(s => {
-             if (s.weight > maxWeight) maxWeight = s.weight;
+             const weightInKg = s.unit === 'lbs' ? (s.weight || 0) * 0.453592 : (s.weight || 0);
+             if (weightInKg > maxWeight) maxWeight = weightInKg;
              totalReps += (s.reps || 0);
-             totalVolume += (s.weight || 0) * (s.reps || 0);
+             totalVolume += weightInKg * (s.reps || 0);
            });
-           data.push({ date: dateStr.slice(5), Weight: maxWeight, Repetitions: totalReps, Volume: totalVolume });
+           data.push({ date: dateStr.slice(5), Weight: Math.round(maxWeight), Repetitions: totalReps, Volume: Math.round(totalVolume) });
          }
        });
     });
@@ -146,30 +158,29 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
                   <YAxis stroke="#9ba1a6" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={{ backgroundColor: '#1a1d24', borderColor: '#333', borderRadius: '8px', color: '#fff' }} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Bar dataKey="Chest" stackId="a" fill="#00e5ff" onClick={() => { setSelectedMuscle('Chest'); setLevel(2); }} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Back" stackId="a" fill="#ff2a2a" onClick={() => { setSelectedMuscle('Back'); setLevel(2); }} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Legs" stackId="a" fill="#39ff14" onClick={() => { setSelectedMuscle('Legs'); setLevel(2); }} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Shoulders" stackId="a" fill="#ff5e00" onClick={() => { setSelectedMuscle('Shoulders'); setLevel(2); }} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Arms" stackId="a" fill="#bf00ff" onClick={() => { setSelectedMuscle('Arms'); setLevel(2); }} style={{cursor: 'pointer'}} />
+                  {uniqueMuscles.map((m, idx) => (
+                    <Bar 
+                      key={m} 
+                      dataKey={m} 
+                      stackId="a" 
+                      fill={getMuscleColor(idx)} 
+                      onClick={() => { setSelectedMuscle(m); setLevel(2); }} 
+                      style={{cursor: 'pointer'}} 
+                    />
+                  ))}
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
             <div className="mt-20" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-              {[
-                { name: 'Chest', color: '#00e5ff' },
-                { name: 'Back', color: '#ff2a2a' },
-                { name: 'Legs', color: '#39ff14' },
-                { name: 'Shoulders', color: '#ff5e00' },
-                { name: 'Arms', color: '#bf00ff' }
-              ].map(m => (
+              {uniqueMuscles.map((m, idx) => (
                 <button 
-                  key={m.name} 
-                  onClick={() => { setSelectedMuscle(m.name); setLevel(2); }}
+                  key={m} 
+                  onClick={() => { setSelectedMuscle(m); setLevel(2); }}
                   style={{ 
                     background: 'rgba(255,255,255,0.05)', 
-                    border: `1px solid ${m.color}`, 
-                    color: m.color, 
+                    border: `1px solid ${getMuscleColor(idx)}`, 
+                    color: getMuscleColor(idx), 
                     padding: '8px 14px', 
                     borderRadius: '20px', 
                     fontSize: '13px', 
@@ -177,7 +188,7 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
                     cursor: 'pointer' 
                   }}
                 >
-                  {m.name}
+                  {m}
                 </button>
               ))}
             </div>

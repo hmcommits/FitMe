@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import './CalendarView.css';
-
-// Map muscle groups to colors
-const muscleColors = {
-  Chest: '#00e5ff', // Electric Blue
-  Back: '#ff2a2a', // Crimson Red
-  Legs: '#39ff14', // Neon Green
-  Shoulders: '#ff5e00', // Orange
-  Arms: '#bf00ff', // Purple
-  Core: '#ffff00', // Yellow
-  Cardio: '#ffffff', // White
-};
 
 export default function CalendarView({ onSelectDate, loggedDates = {} }) {
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  const { uniqueMuscles, muscleColors } = useMemo(() => {
+    const muscles = new Set();
+    Object.values(loggedDates).forEach(dayMuscles => {
+      dayMuscles.forEach(m => muscles.add(m));
+    });
+    const unique = Array.from(muscles);
+    
+    // Assign colors from palette
+    const palette = ['#00e5ff', '#ff2a2a', '#39ff14', '#ff5e00', '#bf00ff', '#ffff00', '#ffffff', '#ff00ff'];
+    const colorMap = {};
+    unique.forEach((m, i) => {
+      // Keep Cardio white for consistency if possible, else assign palette
+      if (m === 'Cardio') colorMap[m] = '#ffffff';
+      else colorMap[m] = palette[i % palette.length];
+    });
+    
+    return { uniqueMuscles: unique, muscleColors: colorMap };
+  }, [loggedDates]);
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();

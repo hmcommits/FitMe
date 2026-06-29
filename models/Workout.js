@@ -15,6 +15,7 @@ const exerciseSchema = new mongoose.Schema({
 });
 
 const workoutSchema = new mongoose.Schema({
+  userEmail: { type: String, required: true },
   date: { type: Date, required: true },
   dayOfWeek: { type: String, required: true },
   bodyWeight: { type: Number },

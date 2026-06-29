@@ -1,4 +1,5 @@
 import './globals.css';
+import AuthProvider from '../components/AuthProvider';
 
 export const metadata = {
   title: 'FitMe - Dominate Your Workout',
@@ -22,7 +23,9 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <main className="mobile-container">
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </main>
       </body>
     </html>

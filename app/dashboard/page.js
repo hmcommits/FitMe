@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import GlobalHeader from '../../components/GlobalHeader';
 import StrengthLogger from '../../components/StrengthLogger';
 import CardioLogger from '../../components/CardioLogger';
@@ -8,12 +10,24 @@ import CalendarView from '../../components/CalendarView';
 import InsightsDashboard from '../../components/InsightsDashboard';
 
 export default function Dashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [day, setDay] = useState('');
   const [weight, setWeight] = useState('');
   
   const [mainTab, setMainTab] = useState('logger'); // 'logger', 'calendar', 'insights'
   const [activeTab, setActiveTab] = useState('strength');
+
+  if (status === 'unauthenticated') {
+    router.push('/login');
+    return null;
+  }
+
+  if (status === 'loading') {
+    return <div style={{width:'100%', height:'100vh', display:'flex', justifyContent:'center', alignItems:'center'}}>Loading...</div>;
+  }
 
   const handleCalendarSelect = (selectedDate) => {
     setDate(selectedDate);

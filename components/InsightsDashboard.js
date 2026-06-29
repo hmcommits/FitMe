@@ -1,42 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import './InsightsDashboard.css';
 
-// Mock Data for L1
-const weeklyVolumeData = [
-  { name: 'Week 1', Chest: 2500, Back: 3000, Legs: 4500, Arms: 1500, Shoulders: 2000 },
-  { name: 'Week 2', Chest: 2600, Back: 3100, Legs: 4600, Arms: 1600, Shoulders: 2100 },
-  { name: 'Week 3', Chest: 2750, Back: 3200, Legs: 4800, Arms: 1650, Shoulders: 2200 },
-  { name: 'Week 4', Chest: 2900, Back: 3350, Legs: 5000, Arms: 1800, Shoulders: 2300 },
-];
-const qualityData = [{ name: 'Quality', Good: 12, Mid: 5, Bad: 2 }];
-const timeData = [{ name: 'Time', Morning: 14, Evening: 4, Both: 1 }];
-
-// Mock Data for L2 (Muscle Group specific)
-const muscleVolumeData = [
-  { date: '12/06', Volume: 2200 },
-  { date: '15/06', Volume: 2500 },
-  { date: '18/06', Volume: 2450 },
-  { date: '22/06', Volume: 2900 },
-];
-
-const exercisesForMuscle = [
-  { name: 'DB Flat Bench Press', lastDone: '22/06/2026', maxVol: 1500, times: 4 },
-  { name: 'Incline Chest Press', lastDone: '22/06/2026', maxVol: 900, times: 4 },
-  { name: 'Cable Flys', lastDone: '18/06/2026', maxVol: 400, times: 3 },
-];
-
-// Mock Data for L3 (Specific Exercise)
-const exerciseDetailData = [
-  { date: '12/06', Weight: 10, Reps: 24, Volume: 240 },
-  { date: '15/06', Weight: 10, Reps: 30, Volume: 300 },
-  { date: '18/06', Weight: 12.5, Reps: 25, Volume: 312.5 },
-  { date: '22/06', Weight: 12.5, Reps: 28, Volume: 325 },
-];
-
-export default function InsightsDashboard() {
+export default function InsightsDashboard({ workoutHistory = [] }) {
   const [dateFilter, setDateFilter] = useState('Last 30 Days');
   
   // Drill-down State
@@ -45,12 +13,107 @@ export default function InsightsDashboard() {
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [l3Tab, setL3Tab] = useState('Weight'); // 'Weight', 'Reps', 'Volume'
 
-  const handleMuscleClick = (data) => {
-    if(data && data.dataKey) {
-      setSelectedMuscle(data.dataKey);
-      setLevel(2);
-    }
-  };
+  // Dynamic Aggregation Logic
+  const { weeklyVolumeData, qualityData, timeData } = useMemo(() => {
+    const times = { Morning: 0, Evening: 0, Both: 0 };
+    const qualities = { Good: 0, Mid: 0, Bad: 0 };
+    const muscleTotals = { Chest: 0, Back: 0, Legs: 0, Arms: 0, Shoulders: 0 };
+    
+    workoutHistory.forEach(w => {
+      // Time
+      if (w.timeOfDay) {
+         w.timeOfDay.forEach(t => {
+           if (t === 'morning') times.Morning++;
+           if (t === 'evening') times.Evening++;
+           if (t === 'both') times.Both++;
+         });
+      }
+      
+      // Quality
+      if (w.quality === 'Good') qualities.Good++;
+      if (w.quality === 'Mid') qualities.Mid++;
+      if (w.quality === 'Bad') qualities.Bad++;
+      
+      // Volume
+      w.exercises?.forEach(ex => {
+        let exVol = 0;
+        ex.sets?.forEach(s => {
+          exVol += (s.weight || 0) * (s.reps || 0);
+        });
+        if (muscleTotals[ex.muscleGroup] !== undefined) {
+          muscleTotals[ex.muscleGroup] += exVol;
+        }
+      });
+    });
+
+    return {
+      timeData: [{ name: 'Time', ...times }],
+      qualityData: [{ name: 'Quality', ...qualities }],
+      weeklyVolumeData: [{ name: 'Total Volume', ...muscleTotals }]
+    };
+  }, [workoutHistory]);
+
+  const { muscleVolumeData, exercisesForMuscle } = useMemo(() => {
+    if (!selectedMuscle) return { muscleVolumeData: [], exercisesForMuscle: [] };
+    
+    const exMap = {};
+    const volData = [];
+
+    workoutHistory.forEach(w => {
+       const dateStr = new Date(w.date).toISOString().split('T')[0];
+       let dailyVol = 0;
+
+       w.exercises?.forEach(ex => {
+         if (ex.muscleGroup === selectedMuscle) {
+           let exVol = 0;
+           ex.sets?.forEach(s => {
+             exVol += (s.weight || 0) * (s.reps || 0);
+           });
+           dailyVol += exVol;
+
+           if (!exMap[ex.name]) {
+             exMap[ex.name] = { name: ex.name, lastDone: dateStr, maxVol: exVol, times: 1 };
+           } else {
+             exMap[ex.name].times++;
+             if (exVol > exMap[ex.name].maxVol) exMap[ex.name].maxVol = exVol;
+             if (dateStr > exMap[ex.name].lastDone) exMap[ex.name].lastDone = dateStr;
+           }
+         }
+       });
+       
+       if (dailyVol > 0) {
+         volData.push({ date: dateStr.slice(5), Volume: dailyVol });
+       }
+    });
+
+    return {
+      muscleVolumeData: volData.reverse(), // chronologically
+      exercisesForMuscle: Object.values(exMap)
+    };
+  }, [workoutHistory, selectedMuscle]);
+
+  const exerciseDetailData = useMemo(() => {
+    if (!selectedExercise) return [];
+    
+    const data = [];
+    workoutHistory.forEach(w => {
+       const dateStr = new Date(w.date).toISOString().split('T')[0];
+       w.exercises?.forEach(ex => {
+         if (ex.name === selectedExercise) {
+           let maxWeight = 0;
+           let totalReps = 0;
+           let totalVolume = 0;
+           ex.sets?.forEach(s => {
+             if (s.weight > maxWeight) maxWeight = s.weight;
+             totalReps += (s.reps || 0);
+             totalVolume += (s.weight || 0) * (s.reps || 0);
+           });
+           data.push({ date: dateStr.slice(5), Weight: maxWeight, Reps: totalReps, Volume: totalVolume });
+         }
+       });
+    });
+    return data.reverse();
+  }, [workoutHistory, selectedExercise]);
 
   const handleExerciseClick = (exerciseName) => {
     setSelectedExercise(exerciseName);
@@ -59,7 +122,6 @@ export default function InsightsDashboard() {
 
   return (
     <div className="insights-container">
-      {/* Global Filter - Shown everywhere */}
       <div className="filter-header">
         <select 
           className="date-filter-dropdown" 
@@ -67,20 +129,14 @@ export default function InsightsDashboard() {
           onChange={(e) => setDateFilter(e.target.value)}
         >
           <option>Last 30 Days</option>
-          <option>Last 3 Months</option>
-          <option>Last 6 Months</option>
           <option>All Time</option>
         </select>
-        <div className="delta-badge positive">
-          <span>▲ +15% Volume</span>
-        </div>
       </div>
 
-      {/* LEVEL 1: MAIN DASHBOARD */}
       {level === 1 && (
         <>
           <div className="insight-card glass-panel mt-20">
-            <h3 className="card-title">Total Weekly Volume (kg)</h3>
+            <h3 className="card-title">Total Volume (kg)</h3>
             <p className="card-subtitle">Select a muscle group to view details</p>
             <div style={{ width: '100%', height: 250, marginTop: '20px' }}>
               <ResponsiveContainer>
@@ -99,7 +155,6 @@ export default function InsightsDashboard() {
               </ResponsiveContainer>
             </div>
 
-            {/* Explicit Muscle Group Menu for reliable mobile drill-down */}
             <div className="mt-20" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
               {[
                 { name: 'Chest', color: '#00e5ff' },
@@ -124,15 +179,6 @@ export default function InsightsDashboard() {
                 >
                   {m.name}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="insight-card glass-panel mt-20">
-            <h3 className="card-title">Workout Consistency</h3>
-            <div className="heatmap-mock mt-10">
-              {Array.from({ length: 28 }).map((_, i) => (
-                <div key={i} className={`heat-square ${Math.random() > 0.3 ? 'active' : ''}`}></div>
               ))}
             </div>
           </div>
@@ -172,7 +218,6 @@ export default function InsightsDashboard() {
         </>
       )}
 
-      {/* LEVEL 2: MUSCLE GROUP DRILL-DOWN */}
       {level === 2 && (
         <div className="drilldown-view mt-10">
           <button className="back-btn" onClick={() => setLevel(1)}>← Back to Dashboard</button>
@@ -211,7 +256,6 @@ export default function InsightsDashboard() {
         </div>
       )}
 
-      {/* LEVEL 3: EXERCISE SPECIFIC DRILL-DOWN */}
       {level === 3 && (
         <div className="drilldown-view mt-10">
           <button className="back-btn" onClick={() => setLevel(2)}>← Back to {selectedMuscle}</button>

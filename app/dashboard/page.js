@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import GlobalHeader from '../../components/GlobalHeader';
@@ -19,13 +19,45 @@ export default function Dashboard() {
   
   const [mainTab, setMainTab] = useState('logger'); // 'logger', 'calendar', 'insights'
   const [activeTab, setActiveTab] = useState('strength');
+  const [workouts, setWorkouts] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchWorkouts() {
+      if (status !== 'authenticated') return;
+      try {
+        const res = await fetch('/api/workouts');
+        const data = await res.json();
+        if (data.workouts) setWorkouts(data.workouts);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setDataLoading(false);
+      }
+    }
+    fetchWorkouts();
+  }, [status]);
+
+  const loggedDates = useMemo(() => {
+    const dates = {};
+    workouts.forEach(w => {
+      const d = new Date(w.date).toISOString().split('T')[0];
+      const muscles = new Set(dates[d] || []);
+      w.exercises?.forEach(ex => {
+        if (ex.muscleGroup) muscles.add(ex.muscleGroup);
+      });
+      if (w.workoutType === 'cardio') muscles.add('Cardio');
+      dates[d] = Array.from(muscles);
+    });
+    return dates;
+  }, [workouts]);
 
   if (status === 'unauthenticated') {
     router.push('/login');
     return null;
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || dataLoading) {
     return <div style={{width:'100%', height:'100vh', display:'flex', justifyContent:'center', alignItems:'center'}}>Loading...</div>;
   }
 
@@ -72,22 +104,22 @@ export default function Dashboard() {
           </nav>
 
           <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
-            {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} />}
-            {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} />}
-            {activeTab === 'cardio' && <CardioLogger />}
+            {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} />}
+            {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} />}
+            {activeTab === 'cardio' && <CardioLogger date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} />}
           </div>
         </>
       )}
 
       {mainTab === 'calendar' && (
         <div style={{ padding: '0 20px' }}>
-          <CalendarView onSelectDate={handleCalendarSelect} />
+          <CalendarView onSelectDate={handleCalendarSelect} loggedDates={loggedDates} />
         </div>
       )}
 
       {mainTab === 'insights' && (
         <div style={{ padding: '0 20px' }}>
-          <InsightsDashboard />
+          <InsightsDashboard workoutHistory={workouts} />
         </div>
       )}
 

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Dropdown from './Dropdown';
 import './StrengthLogger.css';
 
-export default function StrengthLogger({ isHomeWorkout = false }) {
+export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyWeight, onSaveSuccess }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
   const [muscleGroup, setMuscleGroup] = useState('');
@@ -13,9 +13,10 @@ export default function StrengthLogger({ isHomeWorkout = false }) {
   const [nextGoal, setNextGoal] = useState('');
   const [todayNotes, setTodayNotes] = useState('');
   const [quality, setQuality] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Dummy history state (In reality, we would fetch this from the database/localStorage)
-  const [muscleHistory, setMuscleHistory] = useState(['Chest', 'Back', 'Legs']);
+  const [muscleHistory, setMuscleHistory] = useState(['Chest', 'Back', 'Legs', 'Arms', 'Shoulders']);
   const [exerciseHistory, setExerciseHistory] = useState(['Bench Press', 'Incline Press', 'Flyes']);
 
   const addSet = () => {
@@ -31,6 +32,51 @@ export default function StrengthLogger({ isHomeWorkout = false }) {
   const removeSet = (index) => {
     const newSets = sets.filter((_, i) => i !== index);
     setSets(newSets);
+  };
+
+  const handleSave = async () => {
+    if (!muscleGroup || !exercise) {
+      alert("Please select a Muscle Group and Exercise");
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    const payload = {
+      date,
+      dayOfWeek: day || 'Unknown',
+      bodyWeight: Number(bodyWeight) || null,
+      workoutType: isHomeWorkout ? 'home_workout' : 'strength',
+      timeOfDay: [timeOfDay],
+      timeNotes,
+      quality,
+      nextGoal,
+      todayNotes,
+      exercises: [{
+        muscleGroup,
+        name: exercise,
+        sets: sets.map(s => ({ weight: Number(s.weight), reps: Number(s.reps) }))
+      }]
+    };
+
+    try {
+      const res = await fetch('/api/workouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        alert('Workout Saved!');
+        if (onSaveSuccess) onSaveSuccess();
+      } else {
+        alert('Error saving workout');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error saving workout');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -135,8 +181,12 @@ export default function StrengthLogger({ isHomeWorkout = false }) {
           </div>
         </div>
 
-        <button className={`btn btn-primary w-100 mt-20 save-btn ${isHomeWorkout ? 'home-btn' : 'strength-btn'}`}>
-          Save {isHomeWorkout ? 'Home' : 'Strength'} Record
+        <button 
+          className={`btn btn-primary w-100 mt-20 save-btn ${isHomeWorkout ? 'home-btn' : 'strength-btn'}`}
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? 'Saving...' : `Save ${isHomeWorkout ? 'Home' : 'Strength'} Record`}
         </button>
       </div>
     </div>

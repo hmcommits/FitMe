@@ -14,17 +14,8 @@ const muscleColors = {
   Cardio: '#ffffff', // White
 };
 
-export default function CalendarView({ onSelectDate, loggedDates }) {
+export default function CalendarView({ onSelectDate, loggedDates = {} }) {
   const [currentDate, setCurrentDate] = useState(new Date());
-
-  // Dummy data for visual representation if loggedDates isn't passed
-  // Format: { 'YYYY-MM-DD': ['Chest', 'Cardio'] }
-  const mockLoggedDates = loggedDates || {
-    '2026-06-22': ['Chest', 'Cardio'],
-    '2026-06-20': ['Legs'],
-    '2026-06-18': ['Back', 'Arms'],
-    '2026-06-15': ['Cardio'],
-  };
 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
@@ -53,7 +44,7 @@ export default function CalendarView({ onSelectDate, loggedDates }) {
     // Days of the month
     for (let d = 1; d <= daysInMonth; d++) {
       const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-      const hasWorkout = mockLoggedDates[dateString];
+      const hasWorkout = loggedDates[dateString];
       
       days.push(
         <div 

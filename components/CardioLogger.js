@@ -3,17 +3,64 @@
 import { useState } from 'react';
 import Dropdown from './Dropdown';
 
-export default function CardioLogger() {
+export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
   const [exercise, setExercise] = useState('');
-  const [durationMinutes, setDurationMinutes] = useState('');
+  const [duration, setDuration] = useState('');
   const [speedLevel, setSpeedLevel] = useState(''); // Specific to Stair Master
   const [nextGoal, setNextGoal] = useState('');
   const [todayNotes, setTodayNotes] = useState('');
   const [quality, setQuality] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const [exerciseHistory, setExerciseHistory] = useState(['Treadmill', 'Cycling', 'Elliptical', 'Stair Master']);
+  const [exerciseHistory, setExerciseHistory] = useState(['Treadmill', 'Cycling', 'Stair Master', 'Rowing']);
+
+  const handleSave = async () => {
+    if (!exercise || !duration) {
+      alert("Please select an Exercise and enter Duration");
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    const payload = {
+      date,
+      dayOfWeek: day || 'Unknown',
+      bodyWeight: Number(bodyWeight) || null,
+      workoutType: 'cardio',
+      timeOfDay: [timeOfDay],
+      timeNotes,
+      quality,
+      nextGoal,
+      todayNotes,
+      exercises: [{
+        muscleGroup: 'Cardio',
+        name: exercise,
+        durationMinutes: Number(duration),
+        speedLevel: exercise === 'Stair Master' ? Number(speedLevel) : null,
+      }]
+    };
+
+    try {
+      const res = await fetch('/api/workouts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        alert('Cardio Workout Saved!');
+        if (onSaveSuccess) onSaveSuccess();
+      } else {
+        alert('Error saving workout');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('Error saving workout');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const isStairMaster = exercise.toLowerCase() === 'stair master';
 
@@ -57,8 +104,8 @@ export default function CardioLogger() {
             <label style={{ fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '8px', display: 'block' }}>Duration (Mins)</label>
             <input 
               type="number" 
-              value={durationMinutes} 
-              onChange={(e) => setDurationMinutes(e.target.value)}
+              value={duration} 
+              onChange={(e) => setDuration(e.target.value)}
               placeholder="0"
               style={{ width: '100%', padding: '12px', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}
             />
@@ -109,8 +156,13 @@ export default function CardioLogger() {
           </div>
         </div>
 
-        <button className="btn btn-primary w-100 mt-20 save-btn" style={{ background: 'linear-gradient(135deg, var(--accent-cardio), #0088cc)', boxShadow: '0 4px 15px rgba(0, 229, 255, 0.3)' }}>
-          Save Cardio Record
+        <button 
+          className="btn btn-primary w-100 mt-20 cardio-btn save-btn"
+          onClick={handleSave}
+          disabled={isSaving}
+          style={{ background: 'linear-gradient(135deg, var(--accent-cardio), #0088cc)', boxShadow: '0 4px 15px rgba(0, 229, 255, 0.3)' }}
+        >
+          {isSaving ? 'Saving...' : 'Save Cardio Record'}
         </button>
       </div>
     </div>

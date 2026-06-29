@@ -144,9 +144,11 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
           <div style={{ flex: 1 }}>
             <label style={{ fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '8px', display: 'block' }}>Duration (Mins)</label>
             <input 
-              type="number" 
+              type="text" 
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={duration} 
-              onChange={(e) => setDuration(e.target.value)}
+              onChange={(e) => setDuration(e.target.value.replace(/[^0-9]/g, ''))}
               placeholder="0"
               style={{ width: '100%', padding: '12px', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}
             />
@@ -156,9 +158,11 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
             <div style={{ flex: 1 }}>
               <label style={{ fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '8px', display: 'block' }}>Speed Level</label>
               <input 
-                type="number" 
+                type="text" 
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={speedLevel} 
-                onChange={(e) => setSpeedLevel(e.target.value)}
+                onChange={(e) => setSpeedLevel(e.target.value.replace(/[^0-9]/g, ''))}
                 placeholder="0"
                 style={{ width: '100%', padding: '12px', textAlign: 'center', fontSize: '18px', fontWeight: 'bold' }}
               />

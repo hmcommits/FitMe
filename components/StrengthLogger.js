@@ -231,28 +231,32 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
                   {ex.sets.map((set, setIndex) => (
                     <div key={setIndex} className="set-row">
                       <span className="set-number">{setIndex + 1}</span>
-                      <div style={{ display: 'flex', gap: '5px', minWidth: 0 }}>
+                      <div style={{ display: 'flex', gap: '5px', minWidth: 0, width: '100%' }}>
                         <input 
-                          type="number" 
+                          type="text"
+                          inputMode="decimal"
                           value={set.weight} 
-                          onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
+                          onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value.replace(/[^0-9.]/g, ''))}
                           placeholder="0"
-                          style={{ flex: 1, minWidth: 0 }}
+                          style={{ width: '60%', minWidth: 0 }}
                         />
                         <select 
                           value={set.unit} 
                           onChange={(e) => updateSet(exIndex, setIndex, 'unit', e.target.value)}
-                          style={{ flex: '0 0 45px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: 'none', borderRadius: '4px', outline: 'none', padding: '0 2px', fontSize: '13px' }}
+                          style={{ width: '40%', minWidth: 0, background: 'rgba(255,255,255,0.05)', color: 'var(--text-primary)', border: 'none', borderRadius: '4px', outline: 'none', padding: '0 2px', fontSize: '12px' }}
                         >
                           <option value="kg">kg</option>
                           <option value="lbs">lbs</option>
                         </select>
                       </div>
                       <input 
-                        type="number" 
+                        type="text" 
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={set.reps} 
-                        onChange={(e) => updateSet(exIndex, setIndex, 'reps', e.target.value)}
+                        onChange={(e) => updateSet(exIndex, setIndex, 'reps', e.target.value.replace(/[^0-9]/g, ''))}
                         placeholder="0"
+                        style={{ minWidth: 0, width: '100%' }}
                       />
                       {ex.sets.length > 1 && (
                         <button className="remove-set-btn" onClick={() => removeSet(exIndex, setIndex)}>×</button>

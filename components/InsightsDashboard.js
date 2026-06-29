@@ -81,7 +81,7 @@ export default function InsightsDashboard() {
         <>
           <div className="insight-card glass-panel mt-20">
             <h3 className="card-title">Total Weekly Volume (kg)</h3>
-            <p className="card-subtitle">Tap a muscle color to drill down</p>
+            <p className="card-subtitle">Select a muscle group to view details</p>
             <div style={{ width: '100%', height: 250, marginTop: '20px' }}>
               <ResponsiveContainer>
                 <BarChart data={weeklyVolumeData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
@@ -90,13 +90,41 @@ export default function InsightsDashboard() {
                   <YAxis stroke="#9ba1a6" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip contentStyle={{ backgroundColor: '#1a1d24', borderColor: '#333', borderRadius: '8px', color: '#fff' }} />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Bar dataKey="Chest" stackId="a" fill="#00e5ff" onClick={handleMuscleClick} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Back" stackId="a" fill="#ff2a2a" onClick={handleMuscleClick} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Legs" stackId="a" fill="#39ff14" onClick={handleMuscleClick} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Shoulders" stackId="a" fill="#ff5e00" onClick={handleMuscleClick} style={{cursor: 'pointer'}} />
-                  <Bar dataKey="Arms" stackId="a" fill="#bf00ff" onClick={handleMuscleClick} style={{cursor: 'pointer'}} />
+                  <Bar dataKey="Chest" stackId="a" fill="#00e5ff" onClick={() => { setSelectedMuscle('Chest'); setLevel(2); }} style={{cursor: 'pointer'}} />
+                  <Bar dataKey="Back" stackId="a" fill="#ff2a2a" onClick={() => { setSelectedMuscle('Back'); setLevel(2); }} style={{cursor: 'pointer'}} />
+                  <Bar dataKey="Legs" stackId="a" fill="#39ff14" onClick={() => { setSelectedMuscle('Legs'); setLevel(2); }} style={{cursor: 'pointer'}} />
+                  <Bar dataKey="Shoulders" stackId="a" fill="#ff5e00" onClick={() => { setSelectedMuscle('Shoulders'); setLevel(2); }} style={{cursor: 'pointer'}} />
+                  <Bar dataKey="Arms" stackId="a" fill="#bf00ff" onClick={() => { setSelectedMuscle('Arms'); setLevel(2); }} style={{cursor: 'pointer'}} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+
+            {/* Explicit Muscle Group Menu for reliable mobile drill-down */}
+            <div className="mt-20" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+              {[
+                { name: 'Chest', color: '#00e5ff' },
+                { name: 'Back', color: '#ff2a2a' },
+                { name: 'Legs', color: '#39ff14' },
+                { name: 'Shoulders', color: '#ff5e00' },
+                { name: 'Arms', color: '#bf00ff' }
+              ].map(m => (
+                <button 
+                  key={m.name} 
+                  onClick={() => { setSelectedMuscle(m.name); setLevel(2); }}
+                  style={{ 
+                    background: 'rgba(255,255,255,0.05)', 
+                    border: `1px solid ${m.color}`, 
+                    color: m.color, 
+                    padding: '8px 14px', 
+                    borderRadius: '20px', 
+                    fontSize: '13px', 
+                    fontWeight: 'bold',
+                    cursor: 'pointer' 
+                  }}
+                >
+                  {m.name}
+                </button>
+              ))}
             </div>
           </div>
 

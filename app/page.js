@@ -1,147 +1,105 @@
 "use client";
 
-import { useState } from 'react';
-import GlobalHeader from '../components/GlobalHeader';
-import StrengthLogger from '../components/StrengthLogger';
-import CardioLogger from '../components/CardioLogger';
-import CalendarView from '../components/CalendarView';
-import InsightsDashboard from '../components/InsightsDashboard';
+import Link from 'next/link';
 
-export default function Home() {
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
-  const [day, setDay] = useState('');
-  const [weight, setWeight] = useState('');
-  
-  const [mainTab, setMainTab] = useState('logger'); // 'logger', 'calendar', 'insights'
-  const [activeTab, setActiveTab] = useState('strength');
-
-  const handleCalendarSelect = (selectedDate) => {
-    setDate(selectedDate);
-    // Auto-calculate day
-    const dateObj = new Date(selectedDate);
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    if (!isNaN(dateObj.getDay())) {
-      setDay(days[dateObj.getDay()]);
-    }
-    setMainTab('logger'); // Jump to the logger to view/edit this day
-  };
-
+export default function LandingPage() {
   return (
-    <div style={{ width: '100%', paddingBottom: '80px' }}>
-      <GlobalHeader 
-        date={date} setDate={setDate} 
-        day={day} setDay={setDay} 
-        weight={weight} setWeight={setWeight} 
-      />
-
-      {mainTab === 'logger' && (
-        <>
-          <nav className="tab-navigation">
-            <button 
-              className={`tab-btn tab-strength ${activeTab === 'strength' ? 'active' : ''}`}
-              onClick={() => setActiveTab('strength')}
-            >
-              Strength
+    <div className="landing-container">
+      <div className="hero">
+        <h1 className="hero-title">
+          DOMINATE YOUR <br />
+          <span className="accent-gradient">WORKOUT</span>
+        </h1>
+        <p className="hero-subtitle">
+          The premium, mobile-first fitness tracker for those who take their gains seriously.
+        </p>
+        
+        <div className="cta-group mt-20">
+          <Link href="/login">
+            <button className="btn btn-primary w-100" style={{ padding: '18px', fontSize: '18px' }}>
+              GET STARTED
             </button>
-            <button 
-              className={`tab-btn tab-cardio ${activeTab === 'cardio' ? 'active' : ''}`}
-              onClick={() => setActiveTab('cardio')}
-            >
-              Cardio
+          </Link>
+          <Link href="/login?mode=login">
+            <button className="btn w-100 mt-10" style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)' }}>
+              LOG IN
             </button>
-            <button 
-              className={`tab-btn tab-home ${activeTab === 'home_workout' ? 'active' : ''}`}
-              onClick={() => setActiveTab('home_workout')}
-            >
-              Home Workout
-            </button>
-          </nav>
-
-          <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
-            {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} />}
-            {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} />}
-            {activeTab === 'cardio' && <CardioLogger />}
-          </div>
-        </>
-      )}
-
-      {mainTab === 'calendar' && (
-        <div style={{ padding: '0 20px' }}>
-          <CalendarView onSelectDate={handleCalendarSelect} />
+          </Link>
         </div>
-      )}
+      </div>
 
-      {mainTab === 'insights' && (
-        <div style={{ padding: '0 20px' }}>
-          <InsightsDashboard />
+      <div className="features mt-20">
+        <div className="glass-panel feature-card">
+          <h3 style={{ color: '#00e5ff' }}>Tracking</h3>
+          <p>Seamlessly log Strength, Cardio, and Home Workouts with a single tap.</p>
         </div>
-      )}
-
-      {/* Fixed Bottom App Navigation */}
-      <nav className="app-bottom-nav">
-        <button className={mainTab === 'logger' ? 'active' : ''} onClick={() => setMainTab('logger')}>📝 Log</button>
-        <button className={mainTab === 'calendar' ? 'active' : ''} onClick={() => setMainTab('calendar')}>📅 Calendar</button>
-        <button className={mainTab === 'insights' ? 'active' : ''} onClick={() => setMainTab('insights')}>📈 Insights</button>
-      </nav>
+        <div className="glass-panel feature-card mt-10">
+          <h3 style={{ color: '#ff2a2a' }}>Analytics</h3>
+          <p>Visualize your progress with Level 1, 2, and 3 volume drill-downs.</p>
+        </div>
+        <div className="glass-panel feature-card mt-10">
+          <h3 style={{ color: '#39ff14' }}>Consistency</h3>
+          <p>Keep your streak alive with the visual Calendar heatmaps.</p>
+        </div>
+      </div>
 
       <style jsx>{`
-        .tab-navigation {
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-          margin-bottom: 20px;
-          padding: 0 20px;
-        }
-        .tab-btn {
-          flex: 1;
-          padding: 10px 0;
-          border-radius: 20px;
-          background: transparent;
-          font-weight: 700;
-          font-size: 14px;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all 0.3s;
-          color: var(--text-secondary);
-        }
-        
-        .tab-strength { border: 2px solid var(--accent-strength); }
-        .tab-strength.active { background: var(--accent-strength); color: #fff; }
-        
-        .tab-cardio { border: 2px solid var(--accent-cardio); }
-        .tab-cardio.active { background: var(--accent-cardio); color: #000; }
-        
-        .tab-home { border: 2px solid var(--accent-home); }
-        .tab-home.active { background: var(--accent-home); color: #000; }
-
-        .app-bottom-nav {
-          position: fixed;
-          bottom: 0;
-          left: 0;
+        .landing-container {
           width: 100%;
-          max-width: 480px; /* match container */
-          left: 50%;
-          transform: translateX(-50%);
-          background: var(--surface-color);
+          min-height: 100vh;
+          padding: 40px 20px;
           display: flex;
-          justify-content: space-around;
-          padding: 15px 0;
-          border-top: 1px solid rgba(255,255,255,0.1);
-          z-index: 100;
+          flex-direction: column;
+          justify-content: center;
+          background: radial-gradient(circle at top right, rgba(255,42,42,0.1), transparent 50%),
+                      radial-gradient(circle at bottom left, rgba(0,229,255,0.1), transparent 50%);
+        }
+        
+        .hero {
+          text-align: center;
+          margin-bottom: 40px;
         }
 
-        .app-bottom-nav button {
-          background: transparent;
-          border: none;
+        .hero-title {
+          font-size: 42px;
+          line-height: 1.1;
+          margin-bottom: 15px;
+          color: var(--text-primary);
+        }
+
+        .accent-gradient {
+          background: linear-gradient(135deg, var(--accent-action), #ff2a2a);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+          font-size: 16px;
+          color: var(--text-secondary);
+          max-width: 300px;
+          margin: 0 auto;
+        }
+
+        .cta-group {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .feature-card {
+          padding: 20px;
+          text-align: left;
+        }
+        
+        .feature-card h3 {
+          margin-bottom: 5px;
+          font-size: 20px;
+        }
+
+        .feature-card p {
           color: var(--text-secondary);
           font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: color var(--transition-speed);
-        }
-
-        .app-bottom-nav button.active {
-          color: var(--accent-action);
+          line-height: 1.4;
         }
       `}</style>
     </div>

@@ -108,7 +108,7 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
              totalReps += (s.reps || 0);
              totalVolume += (s.weight || 0) * (s.reps || 0);
            });
-           data.push({ date: dateStr.slice(5), Weight: maxWeight, Reps: totalReps, Volume: totalVolume });
+           data.push({ date: dateStr.slice(5), Weight: maxWeight, Repetitions: totalReps, Volume: totalVolume });
          }
        });
     });
@@ -264,7 +264,7 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
             <h3 className="card-title" style={{ fontSize: '18px', color: '#fff' }}>{selectedExercise}</h3>
             
             <div className="pill-group mt-10" style={{ display: 'flex', gap: '5px' }}>
-              {['Weight', 'Reps', 'Volume'].map((tab) => (
+              {['Weight', 'Repetitions', 'Volume'].map((tab) => (
                 <button 
                   key={tab}
                   className={`pill-btn ${l3Tab === tab ? 'active' : ''}`}
@@ -286,7 +286,7 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
                   <Line 
                     type="monotone" 
                     dataKey={l3Tab} 
-                    stroke={l3Tab === 'Weight' ? '#ff2a2a' : l3Tab === 'Reps' ? '#39ff14' : '#00e5ff'} 
+                    stroke={l3Tab === 'Weight' ? '#ff2a2a' : l3Tab === 'Repetitions' ? '#39ff14' : '#00e5ff'} 
                     strokeWidth={3} 
                     dot={{ r: 4 }} 
                   />
@@ -296,8 +296,8 @@ export default function InsightsDashboard({ workoutHistory = [] }) {
             
             <p className="card-subtitle text-center mt-20">
               {l3Tab === 'Weight' && "Tracks your heaviest set max weight."}
-              {l3Tab === 'Reps' && "Tracks total endurance repetitions."}
-              {l3Tab === 'Volume' && "Tracks absolute workload (Sets × Reps × Weight)."}
+              {l3Tab === 'Repetitions' && "Tracks total endurance repetitions."}
+              {l3Tab === 'Volume' && "Tracks absolute workload (Sets × Repetitions × Weight)."}
             </p>
           </div>
         </div>

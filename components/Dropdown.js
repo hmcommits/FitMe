@@ -37,6 +37,10 @@ export default function Dropdown({ label, value, onChange, historyOptions, onAdd
     }
   };
 
+  const filteredOptions = historyOptions.filter(opt => 
+    opt.toLowerCase().includes(inputValue.toLowerCase())
+  );
+
   return (
     <div className="dropdown-container" ref={containerRef}>
       <label>{label}</label>
@@ -59,12 +63,12 @@ export default function Dropdown({ label, value, onChange, historyOptions, onAdd
         </button>
       </div>
 
-      {isOpen && historyOptions.length > 0 && (
+      {isOpen && filteredOptions.length > 0 && (
         <ul className="dropdown-menu">
           <li className="dropdown-header" style={{ fontSize: '11px', color: 'var(--text-secondary)', padding: '8px 12px', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'default', background: 'transparent' }}>
-            Recently logged...
+            Recently logged... (Type any new name to save)
           </li>
-          {historyOptions.map((opt, idx) => (
+          {filteredOptions.map((opt, idx) => (
             <li key={idx} onClick={() => handleSelectOption(opt)}>
               {opt}
             </li>

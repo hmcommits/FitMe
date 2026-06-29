@@ -1,43 +1,94 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Dropdown from './Dropdown';
 import './StrengthLogger.css';
 
-export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyWeight, onSaveSuccess }) {
+export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyWeight, onSaveSuccess, workouts = [] }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
-  const [muscleGroup, setMuscleGroup] = useState('');
-  const [exercise, setExercise] = useState('');
-  const [sets, setSets] = useState([{ weight: '', reps: '' }]);
+  
+  // Now managing an array of exercises, each with its own muscle group and sets
+  const [exercisesList, setExercisesList] = useState([
+    { muscleGroup: '', name: '', sets: [{ weight: '', reps: '' }] }
+  ]);
+
   const [nextGoal, setNextGoal] = useState('');
   const [todayNotes, setTodayNotes] = useState('');
   const [quality, setQuality] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Dummy history state (In reality, we would fetch this from the database/localStorage)
-  const [muscleHistory, setMuscleHistory] = useState(['Chest', 'Back', 'Legs', 'Arms', 'Shoulders']);
-  const [exerciseHistory, setExerciseHistory] = useState(['Bench Press', 'Incline Press', 'Flyes']);
+  // Dynamically compute history from past workouts
+  const muscleHistory = useMemo(() => {
+    const muscles = new Set();
+    workouts.forEach(w => {
+      if (w.workoutType === 'strength' || w.workoutType === 'home_workout') {
+        w.exercises?.forEach(ex => {
+          if (ex.muscleGroup) muscles.add(ex.muscleGroup);
+        });
+      }
+    });
+    return Array.from(muscles);
+  }, [workouts]);
 
-  const addSet = () => {
-    setSets([...sets, { weight: '', reps: '' }]);
+  const exerciseHistoryFull = useMemo(() => {
+    const list = [];
+    const names = new Set();
+    workouts.forEach(w => {
+      if (w.workoutType === 'strength' || w.workoutType === 'home_workout') {
+        w.exercises?.forEach(ex => {
+          if (ex.name && !names.has(ex.name)) {
+            names.add(ex.name);
+            list.push({ name: ex.name, muscleGroup: ex.muscleGroup });
+          }
+        });
+      }
+    });
+    return list;
+  }, [workouts]);
+
+  // Exercise List Actions
+  const addExercise = (defaultMuscleGroup = '') => {
+    setExercisesList([...exercisesList, { muscleGroup: defaultMuscleGroup, name: '', sets: [{ weight: '', reps: '' }] }]);
   };
 
-  const updateSet = (index, field, value) => {
-    const newSets = [...sets];
-    newSets[index][field] = value;
-    setSets(newSets);
+  const removeExercise = (exIndex) => {
+    const newList = exercisesList.filter((_, i) => i !== exIndex);
+    setExercisesList(newList);
   };
 
-  const removeSet = (index) => {
-    const newSets = sets.filter((_, i) => i !== index);
-    setSets(newSets);
+  const updateExerciseField = (exIndex, field, value) => {
+    const newList = [...exercisesList];
+    newList[exIndex][field] = value;
+    setExercisesList(newList);
+  };
+
+  // Set Actions within an Exercise
+  const addSet = (exIndex) => {
+    const newList = [...exercisesList];
+    newList[exIndex].sets.push({ weight: '', reps: '' });
+    setExercisesList(newList);
+  };
+
+  const updateSet = (exIndex, setIndex, field, value) => {
+    const newList = [...exercisesList];
+    newList[exIndex].sets[setIndex][field] = value;
+    setExercisesList(newList);
+  };
+
+  const removeSet = (exIndex, setIndex) => {
+    const newList = [...exercisesList];
+    newList[exIndex].sets = newList[exIndex].sets.filter((_, i) => i !== setIndex);
+    setExercisesList(newList);
   };
 
   const handleSave = async () => {
-    if (!muscleGroup || !exercise) {
-      alert("Please select a Muscle Group and Exercise");
-      return;
+    // Validation
+    for (let ex of exercisesList) {
+      if (!ex.muscleGroup || !ex.name) {
+        alert("Please ensure all exercises have a Muscle Group and Exercise name selected.");
+        return;
+      }
     }
     
     setIsSaving(true);
@@ -52,11 +103,11 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
       quality,
       nextGoal,
       todayNotes,
-      exercises: [{
-        muscleGroup,
-        name: exercise,
-        sets: sets.map(s => ({ weight: Number(s.weight), reps: Number(s.reps) }))
-      }]
+      exercises: exercisesList.map(ex => ({
+        muscleGroup: ex.muscleGroup,
+        name: ex.name,
+        sets: ex.sets.map(s => ({ weight: Number(s.weight) || 0, reps: Number(s.reps) || 0 }))
+      }))
     };
 
     try {
@@ -104,50 +155,96 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
           />
         </div>
 
-        <div className="mt-20">
-          <Dropdown 
-            label="Muscle Group"
-            value={muscleGroup}
-            onChange={setMuscleGroup}
-            historyOptions={muscleHistory}
-            onAddHistory={(newOpt) => setMuscleHistory([...muscleHistory, newOpt])}
-          />
+        {/* Dynamic List of Exercises */}
+        <div className="exercises-wrapper mt-20">
+          <label style={{ fontSize: '12px', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700 }}>Your Session</label>
           
-          <Dropdown 
-            label="Exercise"
-            value={exercise}
-            onChange={setExercise}
-            historyOptions={exerciseHistory}
-            onAddHistory={(newOpt) => setExerciseHistory([...exerciseHistory, newOpt])}
-          />
-        </div>
+          {exercisesList.map((ex, exIndex) => {
+            // Filter exercise history specifically for this exercise's selected muscle group
+            const availableExercises = exerciseHistoryFull
+              .filter(item => !ex.muscleGroup || item.muscleGroup === ex.muscleGroup)
+              .map(item => item.name);
 
-        <div className="sets-grid mt-20">
-          <div className="sets-header">
-            <span>Set</span>
-            <span>Weight (kg)</span>
-            <span>Reps</span>
-            <span></span>
+            return (
+              <div key={exIndex} className="exercise-block mt-10" style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h4 style={{ margin: 0, color: 'var(--accent-strength)' }}>Exercise {exIndex + 1}</h4>
+                  {exercisesList.length > 1 && (
+                    <button onClick={() => removeExercise(exIndex)} style={{ background: 'transparent', border: 'none', color: '#ff2a2a', cursor: 'pointer', fontWeight: 'bold' }}>Remove</button>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <Dropdown 
+                    label="Muscle Group"
+                    value={ex.muscleGroup}
+                    onChange={(val) => updateExerciseField(exIndex, 'muscleGroup', val)}
+                    historyOptions={muscleHistory}
+                    onAddHistory={() => {}} 
+                  />
+                  
+                  <Dropdown 
+                    label="Exercise"
+                    value={ex.name}
+                    onChange={(val) => updateExerciseField(exIndex, 'name', val)}
+                    historyOptions={availableExercises}
+                    onAddHistory={() => {}}
+                  />
+                </div>
+
+                <div className="sets-grid mt-20">
+                  <div className="sets-header">
+                    <span>Set</span>
+                    <span>Weight (kg)</span>
+                    <span>Repetitions</span>
+                    <span></span>
+                  </div>
+                  {ex.sets.map((set, setIndex) => (
+                    <div key={setIndex} className="set-row">
+                      <span className="set-number">{setIndex + 1}</span>
+                      <input 
+                        type="number" 
+                        value={set.weight} 
+                        onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
+                        placeholder="0"
+                      />
+                      <input 
+                        type="number" 
+                        value={set.reps} 
+                        onChange={(e) => updateSet(exIndex, setIndex, 'reps', e.target.value)}
+                        placeholder="0"
+                      />
+                      {ex.sets.length > 1 && (
+                        <button className="remove-set-btn" onClick={() => removeSet(exIndex, setIndex)}>×</button>
+                      )}
+                      {ex.sets.length === 1 && <span></span>}
+                    </div>
+                  ))}
+                  <button className="btn w-100 mt-10" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }} onClick={() => addSet(exIndex)}>+ Add Set</button>
+                </div>
+              </div>
+            );
+          })}
+          
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
+            {exercisesList.length > 0 && exercisesList[exercisesList.length - 1].muscleGroup && (
+              <button 
+                className="btn btn-secondary w-100" 
+                onClick={() => addExercise(exercisesList[exercisesList.length - 1].muscleGroup)} 
+                style={{ border: '1px dashed var(--accent-strength)', color: 'var(--accent-strength)' }}
+              >
+                + ADD ANOTHER {exercisesList[exercisesList.length - 1].muscleGroup.toUpperCase()} EXERCISE
+              </button>
+            )}
+            <button 
+              className="btn btn-secondary w-100" 
+              onClick={() => addExercise('')} 
+              style={{ border: '1px dashed rgba(255,255,255,0.2)' }}
+            >
+              + ADD ANOTHER MUSCLE GROUP
+            </button>
           </div>
-          {sets.map((set, index) => (
-            <div key={index} className="set-row">
-              <span className="set-number">{index + 1}</span>
-              <input 
-                type="number" 
-                value={set.weight} 
-                onChange={(e) => updateSet(index, 'weight', e.target.value)}
-                placeholder="0"
-              />
-              <input 
-                type="number" 
-                value={set.reps} 
-                onChange={(e) => updateSet(index, 'reps', e.target.value)}
-                placeholder="0"
-              />
-              <button className="remove-set-btn" onClick={() => removeSet(index)}>×</button>
-            </div>
-          ))}
-          <button className="btn btn-secondary w-100 mt-10" onClick={addSet}>+ Add Set</button>
         </div>
 
         <div className="notes-section mt-20">
@@ -158,7 +255,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
             rows="2"
           />
           <textarea 
-            placeholder="Notes for today's exercise..." 
+            placeholder="Notes for today's overall session..." 
             value={todayNotes} 
             onChange={(e) => setTodayNotes(e.target.value)} 
             rows="2"
@@ -167,7 +264,7 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
         </div>
 
         <div className="quality-selector mt-20">
-          <label>How was the workout?</label>
+          <label>How was the overall workout?</label>
           <div className="pill-group">
             {['Good', 'Mid', 'Bad'].map((q) => (
               <button 

@@ -65,7 +65,7 @@ export default function LandingPage() {
             <div className="feature-icon">📈</div>
             <div className="feature-text">
               <h4 style={{ color: '#00e5ff' }}>Deep Analytics</h4>
-              <p>Drill down from Weekly Muscle Volume all the way to individual exercise trends (Weight, Reps, Workload).</p>
+              <p>Drill down from Weekly Muscle Volume all the way to individual exercise trends (Weight, Repetitions, Workload).</p>
             </div>
           </div>
 

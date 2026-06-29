@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Dropdown from './Dropdown';
 
-export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess }) {
+export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, workouts = [] }) {
   const [timeOfDay, setTimeOfDay] = useState('morning');
   const [timeNotes, setTimeNotes] = useState('');
   const [exercise, setExercise] = useState('');
@@ -14,7 +14,17 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess }) {
   const [quality, setQuality] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  const [exerciseHistory, setExerciseHistory] = useState(['Treadmill', 'Cycling', 'Stair Master', 'Rowing']);
+  const exerciseHistory = useMemo(() => {
+    const exercises = new Set();
+    workouts.forEach(w => {
+      if (w.workoutType === 'cardio') {
+        w.exercises?.forEach(ex => {
+          if (ex.name) exercises.add(ex.name);
+        });
+      }
+    });
+    return Array.from(exercises);
+  }, [workouts]);
 
   const handleSave = async () => {
     if (!exercise || !duration) {
@@ -95,7 +105,7 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess }) {
             value={exercise}
             onChange={setExercise}
             historyOptions={exerciseHistory}
-            onAddHistory={(newOpt) => setExerciseHistory([...exerciseHistory, newOpt])}
+            onAddHistory={() => {}}
           />
         </div>
 

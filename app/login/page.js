@@ -41,12 +41,7 @@ export default function LoginPage() {
         const data = await res.json();
         
         if (res.ok) {
-          // Auto login after signup
-          await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-          });
+          await signIn('credentials', { redirect: false, email, password });
           router.push('/dashboard');
         } else {
           setError(data.message || 'Something went wrong');
@@ -60,145 +55,191 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-container">
-      <div className="glow-orb" style={{ top: '-50px', right: '-50px', background: 'rgba(255,42,42,0.15)' }}></div>
-      <div className="glow-orb" style={{ bottom: '-50px', left: '-50px', background: 'rgba(0,229,255,0.15)' }}></div>
+    <div className="lp-wrapper">
+      {/* Ambient glow orbs */}
+      <div className="glow-orb" style={{ width: 300, height: 300, top: -80, right: -80, background: 'rgba(255,50,50,0.14)' }} />
+      <div className="glow-orb" style={{ width: 250, height: 250, bottom: -60, left: -60, background: 'rgba(0,212,255,0.10)' }} />
 
-      <div className="login-card glass-panel">
-        <h2 className="title">FIT<span style={{color: '#ff2a2a'}}>ME</span></h2>
-        <p className="subtitle">{isLogin ? 'Welcome back.' : 'Create your account.'}</p>
+      <div className="auth-card glass-panel">
+        {/* Logo */}
+        <div className="auth-logo">
+          FIT<span>ME</span>
+        </div>
+        <p className="auth-tagline">
+          {isLogin ? 'Welcome back. Time to grind.' : 'Join the grind. Every rep counts.'}
+        </p>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="auth-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form">
-          <div className="input-group">
-            <label>Email</label>
-            <input 
-              type="email" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
-              required 
+          <div className="auth-input-group">
+            <label className="auth-label">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
               placeholder="you@example.com"
+              className="auth-input"
             />
           </div>
-          <div className="input-group">
-            <label>Password</label>
-            <input 
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
+          <div className="auth-input-group">
+            <label className="auth-label">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
               placeholder="••••••••"
+              className="auth-input"
             />
           </div>
 
-          <button type="submit" className="btn btn-primary w-100 mt-20" disabled={loading}>
-            {loading ? 'Processing...' : isLogin ? 'LOG IN' : 'SIGN UP'}
+          <button type="submit" className="btn btn-primary w-100 auth-submit" disabled={loading}>
+            {loading ? 'Loading...' : isLogin ? '🔥 LOG IN' : '🚀 CREATE ACCOUNT'}
           </button>
         </form>
 
-        <p className="toggle-text mt-20">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <span className="toggle-link" onClick={() => { setIsLogin(!isLogin); setError(''); }}>
-            {isLogin ? 'Sign up' : 'Log in'}
-          </span>
-        </p>
+        <div className="auth-divider">
+          <span />
+          <p>{isLogin ? "New here?" : "Already training?"}</p>
+          <span />
+        </div>
+
+        <button
+          className="auth-toggle-btn"
+          onClick={() => { setIsLogin(!isLogin); setError(''); }}
+        >
+          {isLogin ? 'Create a free account →' : '← Back to login'}
+        </button>
       </div>
 
       <style jsx>{`
-        .login-container {
+        .lp-wrapper {
           width: 100%;
           min-height: 100vh;
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 20px;
+          padding: 24px;
           position: relative;
           overflow: hidden;
         }
 
-        .glow-orb {
-          position: absolute;
-          width: 250px;
-          height: 250px;
-          border-radius: 50%;
-          filter: blur(80px);
-          z-index: 0;
-        }
-
-        .login-card {
+        .auth-card {
           width: 100%;
-          max-width: 380px;
-          padding: 40px 30px;
+          max-width: 400px;
+          padding: 36px 28px;
           z-index: 10;
-          text-align: center;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          border: 1px solid rgba(255, 85, 0, 0.12);
         }
 
-        .title {
-          font-size: 32px;
+        .auth-logo {
+          font-family: 'Barlow Condensed', sans-serif;
+          font-size: 44px;
           font-weight: 900;
-          margin-bottom: 5px;
+          text-transform: uppercase;
+          text-align: center;
+          color: var(--text-primary);
+          letter-spacing: 2px;
+          margin-bottom: 6px;
+        }
+        .auth-logo span {
+          color: var(--accent-strength);
         }
 
-        .subtitle {
+        .auth-tagline {
+          text-align: center;
           color: var(--text-secondary);
-          margin-bottom: 30px;
+          font-size: 14px;
+          margin-bottom: 28px;
         }
 
-        .error-message {
-          background: rgba(255, 42, 42, 0.1);
-          border: 1px solid rgba(255, 42, 42, 0.3);
-          color: #ff2a2a;
-          padding: 10px;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          font-size: 14px;
+        .auth-error {
+          background: rgba(255, 50, 50, 0.10);
+          border: 1px solid rgba(255, 50, 50, 0.30);
+          color: var(--accent-strength);
+          padding: 12px 14px;
+          border-radius: 10px;
+          margin-bottom: 18px;
+          font-size: 13px;
+          text-align: center;
         }
 
         .auth-form {
           display: flex;
           flex-direction: column;
-          gap: 15px;
-          text-align: left;
+          gap: 14px;
+          margin-bottom: 24px;
         }
 
-        .input-group label {
-          font-size: 12px;
+        .auth-input-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .auth-label {
+          font-size: 11px;
           text-transform: uppercase;
-          color: var(--text-secondary);
+          letter-spacing: 1.5px;
+          color: var(--text-muted);
           font-weight: 700;
-          display: block;
-          margin-bottom: 5px;
         }
 
-        .input-group input {
-          width: 100%;
-          padding: 14px;
-          border-radius: 8px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          color: white;
-          font-size: 16px;
+        .auth-input {
+          background: var(--surface-3) !important;
+          border: 1px solid var(--border-medium) !important;
+          color: var(--text-primary) !important;
+          padding: 14px !important;
+          border-radius: 10px !important;
+          font-size: 15px !important;
         }
 
-        .input-group input:focus {
-          border-color: var(--accent-action);
-          outline: none;
+        .auth-submit {
+          height: 54px;
+          font-size: 15px;
+          letter-spacing: 2px;
+          border-radius: 12px;
+          margin-top: 6px;
         }
 
-        .toggle-text {
-          font-size: 14px;
-          color: var(--text-secondary);
+        .auth-divider {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+        }
+        .auth-divider span {
+          flex: 1;
+          height: 1px;
+          background: var(--border-subtle);
+        }
+        .auth-divider p {
+          font-size: 12px;
+          color: var(--text-muted);
+          white-space: nowrap;
         }
 
-        .toggle-link {
+        .auth-toggle-btn {
+          background: transparent;
+          border: 1px solid var(--border-medium);
           color: var(--accent-action);
+          padding: 13px;
+          border-radius: 10px;
+          font-weight: 700;
+          font-size: 14px;
           cursor: pointer;
-          font-weight: bold;
+          width: 100%;
+          transition: all 0.2s;
+          font-family: 'Outfit', sans-serif;
         }
-        
-        .toggle-link:hover {
-          text-decoration: underline;
+        .auth-toggle-btn:hover {
+          background: rgba(255, 85, 0, 0.08);
+          border-color: rgba(255, 85, 0, 0.3);
         }
       `}</style>
     </div>

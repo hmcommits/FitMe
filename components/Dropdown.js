@@ -70,8 +70,8 @@ export default function Dropdown({ label, value, onChange, historyOptions, onAdd
 
       {isOpen && filteredOptions.length > 0 && (
         <ul className="dropdown-menu">
-          <li className="dropdown-header" style={{ fontSize: '11px', color: 'var(--text-secondary)', padding: '8px 12px', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'default', background: 'transparent' }}>
-            Recently logged... (Type any new name to save)
+          <li className="dropdown-header-item">
+            Recently logged...
           </li>
           {filteredOptions.map((opt, idx) => (
             <li key={idx} onClick={() => handleSelectOption(opt)}>

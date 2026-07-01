@@ -105,24 +105,37 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
 
   const isStairMaster = exercise.toLowerCase().replace(/[^a-z]/g, '').includes('stair');
 
+  const timeOptions = [
+    { value: 'morning', icon: '🌅', label: 'Morning' },
+    { value: 'evening', icon: '🌙', label: 'Evening' },
+    { value: 'both',    icon: '⚡', label: 'Both' },
+  ];
+
+  const qualityOptions = [
+    { value: 'Good', icon: '💪', label: 'Good' },
+    { value: 'Mid',  icon: '😐', label: 'Mid' },
+    { value: 'Bad',  icon: '💀', label: 'Bad' },
+  ];
+
   return (
     <div className="logger-container">
       <div className="glass-panel p-15">
         <div className="time-selector">
           <label>Time of Day</label>
           <div className="pill-group">
-            {['morning', 'evening', 'both'].map((t) => (
-              <button 
-                key={t}
-                className={`pill-btn ${timeOfDay === t ? 'active' : ''}`}
-                onClick={() => setTimeOfDay(t)}
+            {timeOptions.map((t) => (
+              <button
+                key={t.value}
+                className={`pill-btn ${timeOfDay === t.value ? 'active' : ''}`}
+                onClick={() => setTimeOfDay(t.value)}
               >
-                {t}
+                <span className="pill-icon">{t.icon}</span>
+                <span className="pill-text">{t.label}</span>
               </button>
             ))}
           </div>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Reason for time choice (optional)"
             value={timeNotes}
             onChange={(e) => setTimeNotes(e.target.value)}
@@ -189,13 +202,14 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
         <div className="quality-selector mt-20">
           <label>How was the cardio?</label>
           <div className="pill-group">
-            {['Good', 'Mid', 'Bad'].map((q) => (
-              <button 
-                key={q}
-                className={`pill-btn ${quality === q ? `active-${q.toLowerCase()}` : ''}`}
-                onClick={() => setQuality(q)}
+            {qualityOptions.map((q) => (
+              <button
+                key={q.value}
+                className={`pill-btn ${quality === q.value ? `active-${q.value.toLowerCase()}` : ''}`}
+                onClick={() => setQuality(q.value)}
               >
-                {q}
+                <span className="pill-icon">{q.icon}</span>
+                <span className="pill-text">{q.label}</span>
               </button>
             ))}
           </div>

@@ -22,7 +22,6 @@ export default function GlobalHeader({ date, setDate, day, setDay, weight, setWe
   const handleDateChange = (e) => {
     const newDate = e.target.value;
     setDate(newDate);
-    // Auto-calculate day
     const dateObj = new Date(newDate);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     if (!isNaN(dateObj.getDay())) {
@@ -43,50 +42,65 @@ export default function GlobalHeader({ date, setDate, day, setDay, weight, setWe
     }
   };
 
+  // Format date nicely: "MON, 30 JUN"
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+  };
+
   return (
-    <header className="global-header glass-panel">
+    <header className="global-header">
       <div className="header-top">
         <div className="date-group">
-          <input 
-            type="date" 
-            value={date} 
-            onChange={handleDateChange} 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span className="day-display">{day || 'Select a date'}</span>
+          </div>
+          <input
+            type="date"
+            value={date}
+            onChange={handleDateChange}
             className="date-input"
           />
-          <span className="day-display">{day || 'Select Date'}</span>
         </div>
-        
+
         <div className="metrics-group">
-          <input 
-            type="number" 
-            placeholder="Weight (kg)" 
-            value={weight} 
-            onChange={(e) => setWeight(e.target.value)}
-            className="weight-input"
-          />
+          <div className="weight-input-wrapper">
+            <span className="weight-prefix">⚖️ BW</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="—"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ''))}
+              className="weight-input"
+            />
+            <span className="weight-prefix">kg</span>
+          </div>
         </div>
       </div>
 
       <div className="header-bottom">
-        <input 
-          type="file" 
-          accept="image/*" 
+        <input
+          type="file"
+          accept="image/*"
           ref={fileInputRef}
           style={{ display: 'none' }}
           onChange={handlePhotoUpload}
         />
-        
+
         {!photoData ? (
           <button className="btn btn-secondary photo-btn" onClick={() => fileInputRef.current.click()}>
-            + Add Photo
+            📷 Add Progress Photo
           </button>
         ) : (
           <div className="photo-actions">
             <button className="btn btn-secondary photo-btn" onClick={() => setIsViewingPhoto(true)}>
-              View Photo
+              👁 View Photo
             </button>
             <button className="btn btn-secondary photo-btn" onClick={() => fileInputRef.current.click()}>
-              Retake
+              🔄 Retake
             </button>
           </div>
         )}

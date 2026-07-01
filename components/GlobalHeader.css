@@ -1,12 +1,20 @@
+/* ============================================================
+   GLOBAL HEADER
+   ============================================================ */
 .global-header {
   width: 100%;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 16px 20px;
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(17,19,24,0.98) 0%, rgba(8,10,13,0.90) 100%);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .header-top {
@@ -15,46 +23,83 @@
   align-items: center;
 }
 
+/* ─── Date Group ─── */
 .date-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 2px;
 }
 
 .date-input {
-  font-size: 18px;
-  font-weight: 700;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   background: transparent;
   border: none;
   padding: 0;
   color: var(--text-primary);
   outline: none;
+  cursor: pointer;
+  line-height: 1;
+  min-width: 0;
 }
 
 .date-input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+  filter: invert(0.4) sepia(1) saturate(3) hue-rotate(330deg);
   cursor: pointer;
+  width: 18px;
+  height: 18px;
+  margin-left: 4px;
 }
 
 .day-display {
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 11px;
+  color: var(--accent-action);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  font-weight: 700;
 }
 
+/* ─── Metrics Group (right side) ─── */
 .metrics-group {
   display: flex;
   align-items: center;
 }
 
-.weight-input {
-  width: 100px;
-  text-align: right;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.weight-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--border-radius-pill);
+  padding: 6px 12px;
 }
 
+.weight-prefix {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.weight-input {
+  width: 60px;
+  text-align: right;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* ─── Header Bottom (Photo) ─── */
 .header-bottom {
   display: flex;
   justify-content: flex-start;
@@ -62,51 +107,48 @@
 
 .photo-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 14px;
-  padding: 10px 15px;
-  border-radius: 8px;
+.photo-btn {
+  font-size: 12px !important;
+  padding: 7px 14px !important;
+  border-radius: var(--border-radius-pill) !important;
+  letter-spacing: 0.5px;
 }
 
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* Photo Modal */
+/* ─── Photo Modal ─── */
 .photo-modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.92);
   z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  backdrop-filter: blur(8px);
 }
 
 .photo-modal-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
 
 .workout-photo {
   max-width: 90vw;
   max-height: 80vh;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  border: 1px solid var(--border-medium);
 }
 
 .photo-modal-content p {
-  color: var(--text-secondary);
-  font-size: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
 }

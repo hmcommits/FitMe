@@ -1,158 +1,153 @@
+/* ============================================================
+   INSIGHTS DASHBOARD
+   ============================================================ */
+
 .insights-container {
   width: 100%;
+  padding-bottom: 20px;
 }
 
+/* ─── Filter Header ─── */
 .filter-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .date-filter-dropdown {
-  background: var(--surface-color);
+  background: var(--surface-3);
   color: var(--text-primary);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 14px;
+  border: 1px solid var(--border-medium);
+  padding: 8px 14px;
+  border-radius: var(--border-radius-pill);
+  font-size: 13px;
   font-weight: 600;
   outline: none;
+  cursor: pointer;
 }
 
+/* ─── Mode Switch ─── */
 .mode-switch {
   display: flex;
   gap: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .mode-btn {
   flex: 1;
-  padding: 10px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 13px 10px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  font-family: 'Outfit', sans-serif;
   font-weight: 700;
   font-size: 14px;
-  text-transform: uppercase;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   color: var(--text-secondary);
-  border: 2px solid rgba(255,255,255,0.1);
+  border: 1.5px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .mode-btn.active-strength {
-  background: var(--accent-strength);
-  color: #fff;
+  background: rgba(255, 50, 50, 0.12);
+  color: var(--accent-strength);
   border-color: var(--accent-strength);
-  box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
+  box-shadow: 0 0 20px var(--glow-strength);
 }
 
 .mode-btn.active-cardio {
-  background: var(--accent-cardio);
-  color: #000;
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--accent-cardio);
   border-color: var(--accent-cardio);
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+  box-shadow: 0 0 20px var(--glow-cardio);
 }
 
-.delta-badge {
-  background: rgba(57, 255, 20, 0.1);
-  color: #39ff14;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 700;
-  border: 1px solid rgba(57, 255, 20, 0.3);
-}
-
-.delta-badge.negative {
-  background: rgba(255, 42, 42, 0.1);
-  color: #ff2a2a;
-  border: 1px solid rgba(255, 42, 42, 0.3);
-}
-
+/* ─── Insight Cards ─── */
 .insight-card {
   padding: 20px;
+  border-top: 2px solid rgba(255, 85, 0, 0.2);
 }
 
 .card-title {
-  font-size: 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
   color: var(--text-primary);
   margin-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 
 .card-subtitle {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
-.text-center {
-  text-align: center;
-}
+.text-center { text-align: center; }
 
-.heatmap-mock {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  justify-content: center;
-}
-
-.heat-square {
-  width: 15px;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 3px;
-}
-
-.heat-square.active {
-  background: var(--accent-action);
-}
-
+/* ─── Split cards ─── */
 .split-cards {
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .split-item {
   flex: 1;
-  padding: 15px;
+  padding: 16px;
 }
 
+/* ─── Drill-down ─── */
 .drilldown-view {
-  animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.25s ease-out;
 }
 
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Back button ─── */
 .back-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
   display: inline-flex;
   align-items: center;
-  transition: color 0.2s;
+  gap: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: var(--border-radius-pill);
+  transition: all 0.2s;
+  margin-bottom: 4px;
 }
 
 .back-btn:hover {
   color: var(--text-primary);
+  border-color: var(--border-medium);
+  background: var(--surface-3);
 }
 
+/* ─── Exercise list ─── */
 .exercise-list-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px;
-  margin-bottom: 10px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
 }
 
 .exercise-list-item:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  background: rgba(255, 85, 0, 0.06);
+  border-left-color: var(--accent-action);
+  transform: translateX(2px);
 }

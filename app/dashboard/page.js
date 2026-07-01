@@ -96,7 +96,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ width: '100%', paddingBottom: '80px' }}>
+    <div style={{ width: '100%', paddingBottom: '90px' }}>
       <GlobalHeader 
         date={date} setDate={setDate} 
         day={day} setDay={setDay} 
@@ -105,28 +105,31 @@ export default function Dashboard() {
 
       {mainTab === 'logger' && (
         <>
-          <nav className="tab-navigation">
+          <nav className="workout-tab-nav">
             <button 
-              className={`tab-btn tab-strength ${activeTab === 'strength' ? 'active' : ''}`}
+              className={`workout-tab-btn wtb-strength ${activeTab === 'strength' ? 'wtb-active-strength' : ''}`}
               onClick={() => setActiveTab('strength')}
             >
-              Strength
+              <span className="wtb-icon">🏋️</span>
+              <span className="wtb-label">Strength</span>
             </button>
             <button 
-              className={`tab-btn tab-cardio ${activeTab === 'cardio' ? 'active' : ''}`}
+              className={`workout-tab-btn wtb-cardio ${activeTab === 'cardio' ? 'wtb-active-cardio' : ''}`}
               onClick={() => setActiveTab('cardio')}
             >
-              Cardio
+              <span className="wtb-icon">🏃</span>
+              <span className="wtb-label">Cardio</span>
             </button>
             <button 
-              className={`tab-btn tab-home ${activeTab === 'home_workout' ? 'active' : ''}`}
+              className={`workout-tab-btn wtb-home ${activeTab === 'home_workout' ? 'wtb-active-home' : ''}`}
               onClick={() => setActiveTab('home_workout')}
             >
-              Home Workout
+              <span className="wtb-icon">🏠</span>
+              <span className="wtb-label">Home</span>
             </button>
           </nav>
 
-          <div className="tab-content" style={{ padding: '0 20px', paddingBottom: '40px' }}>
+          <div className="tab-content-area">
             {activeTab === 'strength' && <StrengthLogger isHomeWorkout={false} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
             {activeTab === 'home_workout' && <StrengthLogger isHomeWorkout={true} date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
             {activeTab === 'cardio' && <CardioLogger date={date} day={day} bodyWeight={weight} onSaveSuccess={() => window.location.reload()} workouts={workouts} existingWorkout={existingWorkoutForTab} />}
@@ -148,71 +151,141 @@ export default function Dashboard() {
 
       {/* Fixed Bottom App Navigation */}
       <nav className="app-bottom-nav">
-        <button className={mainTab === 'logger' ? 'active' : ''} onClick={() => setMainTab('logger')}>📝 Log</button>
-        <button className={mainTab === 'calendar' ? 'active' : ''} onClick={() => setMainTab('calendar')}>📅 Calendar</button>
-        <button className={mainTab === 'insights' ? 'active' : ''} onClick={() => setMainTab('insights')}>📈 Insights</button>
+        <button className={`bnav-btn ${mainTab === 'logger' ? 'bnav-active' : ''}`} onClick={() => setMainTab('logger')}>
+          <span className="bnav-icon">🔥</span>
+          <span className="bnav-label">Log</span>
+        </button>
+        <button className={`bnav-btn ${mainTab === 'calendar' ? 'bnav-active' : ''}`} onClick={() => setMainTab('calendar')}>
+          <span className="bnav-icon">📆</span>
+          <span className="bnav-label">Calendar</span>
+        </button>
+        <button className={`bnav-btn ${mainTab === 'insights' ? 'bnav-active' : ''}`} onClick={() => setMainTab('insights')}>
+          <span className="bnav-icon">⚡</span>
+          <span className="bnav-label">Insights</span>
+        </button>
       </nav>
 
       <style jsx>{`
-        .tab-navigation {
+        /* ─── Workout Type Tab Nav ─── */
+        .workout-tab-nav {
           display: flex;
-          justify-content: center;
-          gap: 10px;
+          gap: 8px;
+          padding: 16px 20px 0;
           margin-bottom: 20px;
-          padding: 0 20px;
         }
-        .tab-btn {
-          flex: 1;
-          padding: 10px 0;
-          border-radius: 20px;
-          background: transparent;
-          font-weight: 700;
-          font-size: 14px;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all 0.3s;
-          color: var(--text-secondary);
-        }
-        
-        .tab-strength { border: 2px solid var(--accent-strength); }
-        .tab-strength.active { background: var(--accent-strength); color: #fff; }
-        
-        .tab-cardio { border: 2px solid var(--accent-cardio); }
-        .tab-cardio.active { background: var(--accent-cardio); color: #000; }
-        
-        .tab-home { border: 2px solid var(--accent-home); }
-        .tab-home.active { background: var(--accent-home); color: #000; }
 
+        .workout-tab-btn {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          padding: 12px 6px;
+          border-radius: 14px;
+          background: var(--surface-2);
+          border: 1.5px solid var(--border-subtle);
+          color: var(--text-secondary);
+          cursor: pointer;
+          transition: all 0.2s;
+          font-family: 'Outfit', sans-serif;
+        }
+
+        .wtb-icon { font-size: 22px; line-height: 1; }
+        .wtb-label {
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        /* Strength active */
+        .wtb-strength { border-color: rgba(255, 50, 50, 0.2); }
+        .wtb-active-strength {
+          background: rgba(255, 50, 50, 0.12);
+          border-color: var(--accent-strength);
+          color: var(--accent-strength);
+          box-shadow: 0 0 20px var(--glow-strength);
+        }
+
+        /* Cardio active */
+        .wtb-cardio { border-color: rgba(0, 212, 255, 0.2); }
+        .wtb-active-cardio {
+          background: rgba(0, 212, 255, 0.12);
+          border-color: var(--accent-cardio);
+          color: var(--accent-cardio);
+          box-shadow: 0 0 20px var(--glow-cardio);
+        }
+
+        /* Home active */
+        .wtb-home { border-color: rgba(46, 255, 106, 0.2); }
+        .wtb-active-home {
+          background: rgba(46, 255, 106, 0.12);
+          border-color: var(--accent-home);
+          color: var(--accent-home);
+          box-shadow: 0 0 20px var(--glow-home);
+        }
+
+        /* ─── Tab content ─── */
+        .tab-content-area {
+          padding: 0 20px 40px;
+        }
+
+        /* ─── Bottom Nav ─── */
         .app-bottom-nav {
           position: fixed;
           bottom: 0;
-          left: 0;
-          width: 100%;
-          max-width: 480px; /* match container */
           left: 50%;
           transform: translateX(-50%);
-          background: var(--surface-color);
+          width: 100%;
+          max-width: 480px;
+          background: rgba(8, 10, 13, 0.95);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           display: flex;
           justify-content: space-around;
-          padding: 15px 0;
-          border-top: 1px solid rgba(255,255,255,0.1);
+          align-items: center;
+          padding: 10px 0 14px;
+          border-top: 1px solid var(--border-subtle);
           z-index: 100;
         }
 
-        .app-bottom-nav button {
+        .bnav-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3px;
           background: transparent;
           border: none;
-          color: var(--text-secondary);
-          font-size: 14px;
-          font-weight: 600;
           cursor: pointer;
-          transition: color var(--transition-speed);
+          padding: 6px 24px;
+          border-radius: 12px;
+          transition: all 0.2s;
+          font-family: 'Outfit', sans-serif;
         }
 
-        .app-bottom-nav button.active {
+        .bnav-icon {
+          font-size: 22px;
+          line-height: 1;
+        }
+
+        .bnav-label {
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          color: var(--text-muted);
+          transition: color 0.2s;
+        }
+
+        .bnav-active .bnav-icon {
+          filter: drop-shadow(0 0 6px rgba(255, 85, 0, 0.7));
+        }
+
+        .bnav-active .bnav-label {
           color: var(--accent-action);
         }
       `}</style>
     </div>
   );
 }
+

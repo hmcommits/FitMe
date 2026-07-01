@@ -50,14 +50,18 @@ export default function CalendarView({ onSelectDate, loggedDates = {} }) {
     }
 
     // Days of the month
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     for (let d = 1; d <= daysInMonth; d++) {
       const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
       const hasWorkout = loggedDates[dateString];
+      const isToday = dateString === todayStr;
       
       days.push(
         <div 
           key={d} 
-          className={`calendar-day ${hasWorkout ? 'active' : 'grayed-out'}`}
+          className={`calendar-day ${hasWorkout ? 'active' : 'grayed-out'} ${isToday ? 'today' : ''}`}
           onClick={() => onSelectDate(dateString)}
         >
           <span className="day-number">{d}</span>
@@ -76,6 +80,7 @@ export default function CalendarView({ onSelectDate, loggedDates = {} }) {
 
     return days;
   };
+
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 

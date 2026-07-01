@@ -159,24 +159,37 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
     }
   };
 
+  const timeOptions = [
+    { value: 'morning', icon: '🌅', label: 'Morning' },
+    { value: 'evening', icon: '🌙', label: 'Evening' },
+    { value: 'both',    icon: '⚡', label: 'Both' },
+  ];
+
+  const qualityOptions = [
+    { value: 'Good', icon: '💪', label: 'Good' },
+    { value: 'Mid',  icon: '😐', label: 'Mid' },
+    { value: 'Bad',  icon: '💀', label: 'Bad' },
+  ];
+
   return (
     <div className="logger-container">
       <div className="glass-panel p-15">
         <div className="time-selector">
           <label>Time of Day</label>
           <div className="pill-group">
-            {['morning', 'evening', 'both'].map((t) => (
-              <button 
-                key={t}
-                className={`pill-btn ${timeOfDay === t ? 'active' : ''}`}
-                onClick={() => setTimeOfDay(t)}
+            {timeOptions.map((t) => (
+              <button
+                key={t.value}
+                className={`pill-btn ${timeOfDay === t.value ? 'active' : ''}`}
+                onClick={() => setTimeOfDay(t.value)}
               >
-                {t}
+                <span className="pill-icon">{t.icon}</span>
+                <span className="pill-text">{t.label}</span>
               </button>
             ))}
           </div>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Reason for time choice (optional)"
             value={timeNotes}
             onChange={(e) => setTimeNotes(e.target.value)}
@@ -195,13 +208,14 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
               .map(item => item.name);
 
             return (
-              <div key={exIndex} className="exercise-block mt-10" style={{ padding: '15px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                  <h4 style={{ margin: 0, color: 'var(--accent-strength)' }}>Exercise {exIndex + 1}</h4>
+              <div key={exIndex} className="exercise-block mt-10">
+                <div className={`exercise-block-header ${isHomeWorkout ? 'home' : ''}`}>
+                  <span className={`exercise-block-title ${isHomeWorkout ? 'home' : ''}`}>Exercise {exIndex + 1}</span>
                   {exercisesList.length > 1 && (
-                    <button onClick={() => removeExercise(exIndex)} style={{ background: 'transparent', border: 'none', color: '#ff2a2a', cursor: 'pointer', fontWeight: 'bold' }}>Remove</button>
+                    <button onClick={() => removeExercise(exIndex)} className="remove-exercise-btn">✕ Remove</button>
                   )}
                 </div>
+                <div style={{ padding: '15px' }}>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                   <Dropdown 
@@ -266,11 +280,11 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
                   ))}
                   <button className="btn w-100 mt-10" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }} onClick={() => addSet(exIndex)}>+ Add Set</button>
                 </div>
+                </div>
               </div>
             );
           })}
-          
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '15px' }}>
             {exercisesList.length > 0 && exercisesList[exercisesList.length - 1].muscleGroup && (
               <button 
@@ -281,10 +295,9 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
                 + ADD ANOTHER {exercisesList[exercisesList.length - 1].muscleGroup.toUpperCase()} EXERCISE
               </button>
             )}
-            <button 
-              className="btn btn-secondary w-100" 
-              onClick={() => addExercise('')} 
-              style={{ border: '1px dashed rgba(255,255,255,0.2)' }}
+            <button
+              className="btn btn-secondary w-100 add-muscle-btn"
+              onClick={() => addExercise('')}
             >
               + ADD ANOTHER MUSCLE GROUP
             </button>
@@ -310,13 +323,14 @@ export default function StrengthLogger({ isHomeWorkout = false, date, day, bodyW
         <div className="quality-selector mt-20">
           <label>How was the overall workout?</label>
           <div className="pill-group">
-            {['Good', 'Mid', 'Bad'].map((q) => (
-              <button 
-                key={q}
-                className={`pill-btn ${quality === q ? `active-${q.toLowerCase()}` : ''}`}
-                onClick={() => setQuality(q)}
+            {qualityOptions.map((q) => (
+              <button
+                key={q.value}
+                className={`pill-btn ${quality === q.value ? `active-${q.value.toLowerCase()}` : ''}`}
+                onClick={() => setQuality(q.value)}
               >
-                {q}
+                <span className="pill-icon">{q.icon}</span>
+                <span className="pill-text">{q.label}</span>
               </button>
             ))}
           </div>

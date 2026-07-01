@@ -1,123 +1,211 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Premium Dark Theme Core */
-  --bg-color: #0d0f12; /* Deep Carbon */
-  --surface-color: #1a1d24; /* Elevated Glass Surface */
-  --surface-color-light: #242830;
-  
-  /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: #9ba1a6;
-  
-  /* Energetic Gym Accents */
-  --accent-strength: #ff2a2a; /* Crimson Red for Strength */
-  --accent-cardio: #00e5ff; /* Electric Blue for Cardio */
-  --accent-home: #39ff14; /* Neon Green for Home Workout */
-  --accent-action: #ff5e00; /* Motivational Orange for primary actions */
-  
-  /* Utilities */
+  /* --- Core Backgrounds --- */
+  --bg-color: #080A0D;
+  --surface-1: #111318;
+  --surface-2: #191C24;
+  --surface-3: #21252F;
+
+  /* Legacy alias kept for compatibility */
+  --surface-color: #111318;
+  --surface-color-light: #21252F;
+
+  /* --- Text --- */
+  --text-primary: #F0F2F5;
+  --text-secondary: #7A8290;
+  --text-muted: #454C59;
+
+  /* --- Energetic Accent Palette --- */
+  --accent-strength: #FF3232;
+  --accent-cardio: #00D4FF;
+  --accent-home: #2EFF6A;
+  --accent-action: #FF5500;
+
+  /* --- Glow Variants --- */
+  --glow-strength: rgba(255, 50, 50, 0.30);
+  --glow-cardio: rgba(0, 212, 255, 0.30);
+  --glow-home: rgba(46, 255, 106, 0.30);
+  --glow-action: rgba(255, 85, 0, 0.30);
+
+  /* --- Borders --- */
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-medium: rgba(255, 255, 255, 0.12);
+
+  /* --- Utility --- */
   --border-radius: 16px;
-  --transition-speed: 0.25s;
+  --border-radius-sm: 10px;
+  --border-radius-pill: 100px;
+  --transition-speed: 0.2s;
 }
 
-* {
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Outfit', sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ============================================================
+   BASE
+   ============================================================ */
 body {
   background-color: var(--bg-color);
   color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
   min-height: 100vh;
-  /* Mobile First layout structure */
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Base mobile container */
 .mobile-container {
   width: 100%;
-  max-width: 480px; /* Max width to feel like an app on desktop */
+  max-width: 480px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
   background-color: var(--bg-color);
-  box-shadow: 0 0 40px rgba(0,0,0,0.5);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
 }
 
-/* Typography Base */
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
 h1, h2, h3 {
+  font-family: 'Barlow Condensed', sans-serif;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  line-height: 1.05;
 }
 
-/* Glassmorphism utility */
+/* ============================================================
+   GLASSMORPHISM
+   ============================================================ */
 .glass-panel {
-  background: rgba(26, 29, 36, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(25, 28, 36, 0.9) 0%, rgba(17, 19, 24, 0.95) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius);
 }
 
-/* Base Inputs */
+/* ============================================================
+   INPUTS
+   ============================================================ */
 input, select, textarea {
-  background: var(--surface-color);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-3);
+  border: 1px solid var(--border-medium);
   color: var(--text-primary);
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  padding: 12px 14px;
   font-family: 'Outfit', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
-  transition: border-color var(--transition-speed);
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--accent-action);
+  box-shadow: 0 0 0 3px var(--glow-action);
 }
 
-/* Hide spin buttons on number inputs */
+/* Hide number spin buttons */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
-}
+input[type="number"] { -moz-appearance: textfield; }
 
-/* Animated Buttons */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 .btn {
-  background: var(--surface-color-light);
+  background: var(--surface-3);
   color: var(--text-primary);
   border: none;
   padding: 14px 20px;
   border-radius: var(--border-radius);
+  font-family: 'Outfit', sans-serif;
   font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   transition: all var(--transition-speed);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-action), #ff2a2a);
-  box-shadow: 0 4px 15px rgba(255, 42, 42, 0.3);
+  background: linear-gradient(135deg, var(--accent-action) 0%, var(--accent-strength) 100%);
+  box-shadow: 0 6px 24px var(--glow-action);
+  color: #fff;
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(255, 42, 42, 0.5);
+  box-shadow: 0 8px 30px rgba(255, 85, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-medium);
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: var(--border-radius-sm);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.w-100 { width: 100%; }
+.mt-5  { margin-top: 5px; }
+.mt-10 { margin-top: 10px; }
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.p-15  { padding: 15px; }
+.p-20  { padding: 20px; }
+.text-center { text-align: center; }
+
+.section-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* ============================================================
+   GLOW ORBS (reusable ambient bg element)
+   ============================================================ */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
 }

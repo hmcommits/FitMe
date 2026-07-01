@@ -79,7 +79,7 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
         muscleGroup: 'Cardio',
         name: exercise,
         durationMinutes: Number(duration),
-        speedLevel: exercise === 'Stair Master' ? Number(speedLevel) : null,
+        speedLevel: (exercise.toLowerCase().replace(/[^a-z]/g, '').includes('stair') ? Number(speedLevel) : null),
       }]
     };
 
@@ -103,7 +103,7 @@ export default function CardioLogger({ date, day, bodyWeight, onSaveSuccess, wor
     }
   };
 
-  const isStairMaster = exercise.toLowerCase() === 'stair master';
+  const isStairMaster = exercise.toLowerCase().replace(/[^a-z]/g, '').includes('stair');
 
   return (
     <div className="logger-container">

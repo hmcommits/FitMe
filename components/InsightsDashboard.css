@@ -20,6 +20,40 @@
   outline: none;
 }
 
+.mode-switch {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--text-secondary);
+  border: 2px solid rgba(255,255,255,0.1);
+}
+
+.mode-btn.active-strength {
+  background: var(--accent-strength);
+  color: #fff;
+  border-color: var(--accent-strength);
+  box-shadow: 0 0 15px rgba(255, 42, 42, 0.3);
+}
+
+.mode-btn.active-cardio {
+  background: var(--accent-cardio);
+  color: #000;
+  border-color: var(--accent-cardio);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+}
+
 .delta-badge {
   background: rgba(57, 255, 20, 0.1);
   color: #39ff14;

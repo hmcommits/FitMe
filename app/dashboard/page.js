@@ -38,6 +38,17 @@ export default function Dashboard() {
     fetchWorkouts();
   }, [status]);
 
+  // Sync header bodyWeight when date or workouts change
+  useEffect(() => {
+    if (!workouts || workouts.length === 0) return;
+    const existing = workouts.find(w => new Date(w.date).toISOString().split('T')[0] === date);
+    if (existing && existing.bodyWeight !== null && existing.bodyWeight !== undefined) {
+      setWeight(existing.bodyWeight.toString());
+    } else {
+      setWeight('');
+    }
+  }, [date, workouts]);
+
   const loggedDates = useMemo(() => {
     const dates = {};
     workouts.forEach(w => {

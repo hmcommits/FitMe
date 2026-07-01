@@ -93,6 +93,19 @@ export default function LoginPage() {
               placeholder="••••••••"
               className="auth-input"
             />
+            {!isLogin && password.length > 0 && (
+              <div className="pw-rules">
+                <div className={`pw-rule ${password.length >= 8 ? 'pw-pass' : 'pw-fail'}`}>
+                  {password.length >= 8 ? '✓' : '✕'} At least 8 characters
+                </div>
+                <div className={`pw-rule ${/[A-Z]/.test(password) ? 'pw-pass' : 'pw-fail'}`}>
+                  {/[A-Z]/.test(password) ? '✓' : '✕'} At least 1 uppercase letter
+                </div>
+                <div className={`pw-rule ${/[0-9]/.test(password) ? 'pw-pass' : 'pw-fail'}`}>
+                  {/[0-9]/.test(password) ? '✓' : '✕'} At least 1 number
+                </div>
+              </div>
+            )}
           </div>
 
           <button type="submit" className="btn btn-primary w-100 auth-submit" disabled={loading}>
@@ -241,6 +254,25 @@ export default function LoginPage() {
           background: rgba(255, 85, 0, 0.08);
           border-color: rgba(255, 85, 0, 0.3);
         }
+
+        /* Password Rules */
+        .pw-rules {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          margin-top: 8px;
+          padding: 10px 12px;
+          background: rgba(255,255,255,0.03);
+          border-radius: 8px;
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .pw-rule {
+          font-size: 12px;
+          font-weight: 600;
+          transition: color 0.2s;
+        }
+        .pw-pass { color: #2EFF6A; }
+        .pw-fail { color: #7A8290; }
       `}</style>
     </div>
   );

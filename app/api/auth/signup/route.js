@@ -8,7 +8,18 @@ export async function POST(req) {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return NextResponse.json({ message: 'Missing fields' }, { status: 400 });
+      return NextResponse.json({ message: 'Email and password are required.' }, { status: 400 });
+    }
+
+    // Password rules
+    if (password.length < 8) {
+      return NextResponse.json({ message: 'Password must be at least 8 characters.' }, { status: 400 });
+    }
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json({ message: 'Password must contain at least 1 uppercase letter.' }, { status: 400 });
+    }
+    if (!/[0-9]/.test(password)) {
+      return NextResponse.json({ message: 'Password must contain at least 1 number.' }, { status: 400 });
     }
 
     await connectToDatabase();

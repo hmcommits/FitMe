@@ -1,0 +1,25 @@
+{
+  "name": "FitMe — Dominate Your Workout",
+  "short_name": "FitMe",
+  "description": "Premium mobile-first workout tracker and analytics",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#080A0D",
+  "theme_color": "#080A0D",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

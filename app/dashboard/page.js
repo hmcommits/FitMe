@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import GlobalHeader from '../../components/GlobalHeader';
 import StrengthLogger from '../../components/StrengthLogger';
 import CardioLogger from '../../components/CardioLogger';
 import CalendarView from '../../components/CalendarView';
 import InsightsDashboard from '../../components/InsightsDashboard';
+import InstallBanner from '../../components/InstallBanner';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -149,6 +150,9 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Install Banner */}
+      <InstallBanner />
+
       {/* Fixed Bottom App Navigation */}
       <nav className="app-bottom-nav">
         <button className={`bnav-btn ${mainTab === 'logger' ? 'bnav-active' : ''}`} onClick={() => setMainTab('logger')}>
@@ -162,6 +166,10 @@ export default function Dashboard() {
         <button className={`bnav-btn ${mainTab === 'insights' ? 'bnav-active' : ''}`} onClick={() => setMainTab('insights')}>
           <span className="bnav-icon">⚡</span>
           <span className="bnav-label">Insights</span>
+        </button>
+        <button className="bnav-btn" onClick={() => signOut({ callbackUrl: '/login' })}>
+          <span className="bnav-icon">🚪</span>
+          <span className="bnav-label">Logout</span>
         </button>
       </nav>
 
